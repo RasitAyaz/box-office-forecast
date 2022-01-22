@@ -16,7 +16,7 @@ budget_vs_revenue = []
 def read_data():
     for year in years:
         index = year - years[0]
-        movies = json.load(open(f'data/{year}.json'))
+        movies = json.load(open(f'data/years/{year}.json'))
         for movie in movies:
             num_of_films[index] += 1
             box_offices[index].append(movie['revenue'])
@@ -56,7 +56,7 @@ def plot_rate_of_movies_for_genres():
 
 
 def plot_box_office_boxplot():
-    plt.boxplot(box_offices, flierprops=dict(marker='o', markerfacecolor=(1, 0, 0, 0.25), markeredgecolor='none', markersize=6), showfliers=False)
+    plt.boxplot(box_offices, flierprops=dict(marker='o', markerfacecolor=(1, 0, 0, 0.25), markeredgecolor='none', markersize=6), showfliers=True)
     plt.xticks(range(1, 31), years, rotation=70)
     plt.xlabel('year')
     plt.ylabel('box office revenue (million $)')
@@ -81,5 +81,5 @@ def plot_budget_vs_revenue():
 
 
 read_data()
-plot_budget_vs_revenue()
+plot_box_office_boxplot()
 plt.show()
