@@ -1,66 +1,87 @@
+from importlib_metadata import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_percentage_error
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 
 def read_dataset():
     return None
 
 
-def find_cost(x: np.ndarray, y, w, b):
-    cost = np.sum((((x.dot(w) + b) - y) ** 2) / (2 * len(y)))
-    return cost
+def cost_function(X, y, weights, bias):
+    return np.sum((((X.dot(weights) + bias) - y) ** 2) / (2 * len(y)))
 
 
-def apply_gradient_descent(x, y, weight, bias, learning_rate, epochs):
-    cost_list = [0] * epochs
+def gradient_descent_function(X: np.ndarray, y, weights, bias, learning_rate, epochs):
+    m = len(y)
+    costs = [0] * epochs
 
     for epoch in range(epochs):
-        z = x.dot(weight) + bias
+        # Forward Propagation
+        z = X.dot(weights) + bias
+
         loss = z - y
 
-        weight_gradient = x.T.dot(loss) / len(y)
-        bias_gradient = np.sum(loss) / len(y)
+        weight_gradient = X.T.dot(loss) / m
+        bias_gradient = np.sum(loss) / m
 
-        weight = weight - learning_rate * weight_gradient
+        weights = weights - learning_rate * weight_gradient
         bias = bias - learning_rate * bias_gradient
 
-        cost = find_cost(x, y, weight, bias)
-        cost_list[epoch] = cost
+        cost = cost_function(X, y, weights, bias)
+        costs[epoch] = cost
 
-        if (epoch % (epochs / 10) == 0):
-            print(f"Cost at epoch {epoch} is {cost}")
-
-    return weight, bias, cost_list
+    return weights, bias, costs
 
 
-def predict(x: np.ndarray, weight, bias):
-    return x.dot(weight) + bias
-
-
-def calculate_r2score(y_predicted, y):
-    rss = np.sum((y_predicted - y) ** 2)
-    tss = np.sum((y - y.mean()) ** 2)
+def r2score(y_pred, y):
+    rss = np.sum((y_pred - y) ** 2)
+    tss = np.sum((y-y.mean()) ** 2)
 
     r2 = 1 - (rss / tss)
     return r2
 
 
-def run(x, y):
-    x_train: np.ndarray
-    x_test: np.ndarray
+def predict(X: np.ndarray, weights, bias):
+    return X.dot(weights) + bias
+
+
+def run(X, y):
+    X_train: np.ndarray
+    X_test: np.ndarray
     y_train: np.ndarray
     y_test: np.ndarray
 
-    x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.25, random_state=100
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.25, random_state=100
     )
 
-    weight, bias, cost_list = apply_gradient_descent(
-        x_train, y_train, np.zeros(x_train.shape[1]), 0, 0.001, epochs=15000
+    weights, bias, costs = gradient_descent_function(
+        X_train, y_train,
+        weights=np.random.randn(X_train.shape[1]),
+        bias=0,
+        learning_rate=0.001,
+        epochs=2000,
     )
 
-    y_predicted = predict(x_test)
+    y_pred = predict(X_test, weights, bias)
+    r2 = r2score(y_pred, y_test)
+    print(f'r2: {r2}')
+    error = mean_absolute_percentage_error(y_test, y_pred)
+    print(f'error: {error}')
+    # plt.scatter(X[:, 0], y)
+    # plt.show()
 
-    print()
+
+data = pd.read_csv('data/dataset.csv')
+
+X = data.iloc[:, 0:-1]
+y = data.iloc[:, -1]
+
+sc = StandardScaler()
+X = sc.fit_transform(X)
+
+run(X, y)
