@@ -36,6 +36,19 @@ def calculate_impact(list, json, date):
     return impact_sum / len(list)
 
 
+def calculate_genre_impact(genres):
+    impact_sum = 0
+    n_genres = 0
+
+    for genre in genres:
+        id = str(genre['id'])
+        if id in genres_json:
+            impact_sum += genres_json[id]['value']
+            n_genres += 1
+
+    return impact_sum / n_genres
+
+
 headers = [
     'budget',
     'director_impact',
@@ -64,6 +77,6 @@ with open('data/dataset.csv', 'w', newline='') as dataset:
                     calculate_impact(directors, directors_json, date),
                     calculate_impact(stars, stars_json, date),
                     calculate_impact(companies, companies_json, date),
-                    # calculate_impact(genres, genres_json, date),
+                    # calculate_genre_impact(genres),
                     movie['revenue'],
                 ])

@@ -1,8 +1,10 @@
 from genericpath import isfile
 import json
+from statistics import mean
 
 
 n_stars = 5
+n_genres = 1
 
 directors = {}
 stars = {}
@@ -26,6 +28,16 @@ def update_impact(item, items, new_credit):
         add_credit(items[id]['credits'], new_credit)
 
 
+def add_genre_value(genre, new_value):
+    id = genre['id']
+    if id not in genres:
+        genres[id] = {'name': genre['name'], 'values': [new_value]}
+    else:
+        if 'values' not in genres[id]:
+            print(genre)
+        genres[id]['values'].append(new_value)
+
+
 def extract(movies):
     for movie in movies:
         date = movie['release_date']
@@ -42,8 +54,16 @@ def extract(movies):
         for company in movie['production_companies']:
             update_impact(company, companies, new_credit)
 
-        for genre in movie['genres']:
-            update_impact(genre, genres, new_credit)
+        for genre in movie['genres'][:n_genres]:
+            add_genre_value(genre, profit)
+
+
+def calculate_genre_values():
+    for id, genre in genres.items():
+        genre: dict
+        values: list = genre['values']
+        genre['value'] = mean(values)
+        genre.pop('values')
 
 
 def store(title, values):
@@ -56,9 +76,13 @@ for year in range(1990, 2020):
     if isfile(path):
         movies = json.load(open(path))
         extract(movies)
-        store('directors', directors)
-        store('stars', stars)
-        store('companies', companies)
-        store('genres', genres)
     else:
         print(f'{path} could not be found.')
+        exit()
+
+calculate_genre_values()
+
+store('directors', directors)
+store('stars', stars)
+store('companies', companies)
+store('genres', genres)
