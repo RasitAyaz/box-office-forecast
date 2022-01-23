@@ -17,48 +17,6 @@ stars_json = read_json_file('data/stars.json')
 companies_json = read_json_file('data/companies.json')
 
 
-def calculate_director_impact(movie):
-    director_value_sum = 0
-    n_directors = 0
-
-    for person in movie['crew']:
-        if person['job'] == 'Director':
-            director = directors_json[str(person['id'])]
-            value_sum = 0
-            n_credits = 0
-            for credit in director['credits']:
-                if credit['date'] > movie['release_date']:
-                    break
-                value_sum += credit['value']
-                n_credits += 1
-
-            director_value_sum += value_sum / n_credits
-            n_directors += 1
-
-    return director_value_sum / n_directors
-
-
-def calculate_star_impact(movie):
-    star_value_sum = 0
-    n_stars = 0
-
-    for i in range(min(5, len(movie['cast']))):
-        person = movie['cast'][i]
-        director = stars_json[str(person['id'])]
-        value_sum = 0
-        n_credits = 0
-        for credit in director['credits']:
-            if credit['date'] > movie['release_date']:
-                break
-            value_sum += credit['value']
-            n_credits += 1
-
-        star_value_sum += value_sum / n_credits
-        n_stars += 1
-
-    return star_value_sum / n_stars
-
-
 def calculate_impact(list, json, date):
     impact_sum = 0
 
