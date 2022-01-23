@@ -1,4 +1,5 @@
 from genericpath import isfile
+import json
 from statistics import mean
 from importlib_metadata import csv
 import pandas as pd
@@ -60,7 +61,7 @@ def predict(X: np.ndarray, weights, bias):
     return X.dot(weights) + bias
 
 
-def run(X, y):
+def build_model(X, y):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=100
     )
@@ -70,7 +71,7 @@ def run(X, y):
         weights=np.random.randn(X_train.shape[1]),
         bias=0,
         learning_rate=0.005,
-        epochs=2500,
+        epochs=1000,
     )
 
     y_pred = predict(X_test, weights, bias)
@@ -78,8 +79,32 @@ def run(X, y):
     print(f'r^2: {r2}')
     mae = mean_absolute_error(y_test, y_pred) * 100 / mean(y_test)
     print(f'MAE (%): {mae}')
-    mse = mean_squared_error(y_test, y_pred, squared=True) * 100 / mean(y_test) ** 2
+    mse = mean_squared_error(
+        y_test, y_pred, squared=True) * 100 / mean(y_test) ** 2
     print(f'MSE (%): {mse}')
+
+    # plt.plot(costs)
+    # plt.xlabel('epochs')
+    # plt.ylabel('cost')
+    # plt.show()
+
+    return {
+        'bias': bias,
+        'weights': weights.tolist(),
+    }
+
+    some_data = [[20000000, 21637263.0,
+                  68001989.73611112, 32916185.11897275, 41637263]]
+    df = pd.DataFrame(some_data, columns=[
+                      'budget', 'director_impact', 'star_impact', 'company_impact', 'revenue'])
+
+    X2 = df.iloc[:, 0:-1]
+    y2 = df.iloc[:, -1]
+
+    sc = StandardScaler()
+    X2 = sc.fit_transform(X2)
+
+    print(f'{y2[0]}: {predict(X2, weights, bias)}')
 
     # plt.scatter(X[:, 0], y, color=(1, 0, 0, 0.25), edgecolors='none')
     # plt.plot(X_test, y_pred, color='blue')
@@ -92,6 +117,7 @@ def remove_outliers(data):
         # 'director_impact',
         # 'star_impact',
         # 'company_impact',
+        # 'genre_impact',
         # 'revenue',
     ]
 
@@ -104,6 +130,21 @@ def remove_outliers(data):
     print(f'Data size after outlier removal: {len(data)}')
 
     return data
+
+
+def store_model(model, headers: list):
+    # Remove revenue header
+    headers.pop()
+    # Add bias header
+    headers.insert(0, 'bias')
+
+    values: list = model['weights']
+    values.insert(0, model['bias'])
+
+    with open('models/linear_regression.csv', 'w', newline='') as model_file:
+        writer = csv.writer(model_file)
+        writer.writerow(headers)
+        writer.writerow(values)
 
 
 dataset_path = 'data/dataset.csv'
@@ -120,6 +161,10 @@ if isfile(dataset_path):
     sc = StandardScaler()
     X = sc.fit_transform(X)
 
-    run(X, y)
+    model = build_model(X, y)
+    
+    store_model(model, list(data))
+
+
 else:
     print(f'{dataset_path} could not be found.')

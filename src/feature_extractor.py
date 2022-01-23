@@ -7,6 +7,7 @@ n_stars = 5
 directors = {}
 stars = {}
 companies = {}
+genres = {}
 
 
 def add_credit(credits: list, new_credit):
@@ -41,6 +42,9 @@ def extract(movies):
         for company in movie['production_companies']:
             update_impact(company, companies, new_credit)
 
+        for genre in movie['genres']:
+            update_impact(genre, genres, new_credit)
+
 
 def store(title, values):
     with open(f'data/{title}.json', 'w') as outfile:
@@ -55,5 +59,6 @@ for year in range(1990, 2020):
         store('directors', directors)
         store('stars', stars)
         store('companies', companies)
+        store('genres', genres)
     else:
         print(f'{path} could not be found.')

@@ -15,6 +15,7 @@ def read_json_file(path):
 directors_json = read_json_file('data/directors.json')
 stars_json = read_json_file('data/stars.json')
 companies_json = read_json_file('data/companies.json')
+genres_json = read_json_file('data/genres.json')
 
 
 def calculate_impact(list, json, date):
@@ -40,6 +41,7 @@ headers = [
     'director_impact',
     'star_impact',
     'company_impact',
+    # 'genre_impact',
     'revenue',
 ]
 
@@ -49,19 +51,19 @@ with open('data/dataset.csv', 'w', newline='') as dataset:
     for year in range(1990, 2020):
         movies = read_json_file(f'data/years/{year}.json')
         for movie in movies:
-            if len(movie['production_companies']) > 0:
-                director_impact = 0
-                date = movie['release_date']
+            date = movie['release_date']
+            directors = [p for p in movie['crew']
+                            if p['job'] == 'Director']
+            stars = movie['cast'][:5]
+            companies = movie['production_companies']
+            genres = movie['genres']
 
-                directors = [p for p in movie['crew']
-                             if p['job'] == 'Director']
-                stars = movie['cast'][:5]
-                companies = movie['production_companies']
-
+            if len(companies) > 0 and len(genres) > 0:
                 writer.writerow([
                     movie['budget'],
                     calculate_impact(directors, directors_json, date),
                     calculate_impact(stars, stars_json, date),
                     calculate_impact(companies, companies_json, date),
+                    # calculate_impact(genres, genres_json, date),
                     movie['revenue'],
                 ])
