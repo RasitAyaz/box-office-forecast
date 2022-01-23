@@ -1,9 +1,10 @@
 from genericpath import isfile
+from statistics import mean
 from importlib_metadata import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_absolute_percentage_error
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -35,7 +36,16 @@ def gradient_descent_function(X: np.ndarray, y, weights, bias, learning_rate, ep
         cost = cost_function(X, y, weights, bias)
         costs[epoch] = cost
 
+        # if epoch % 100 == 0:
+        #     print(f'Epoch {epoch} / {epochs}')
+        #     print(bias)
+        #     print()
+
     return weights, bias, costs
+
+
+def calculate_mape(y, y_pred):
+    return np.sum(abs((y - y_pred) / y)) / len(y)
 
 
 def r2score(y_pred, y):
@@ -60,14 +70,16 @@ def run(X, y):
         weights=np.random.randn(X_train.shape[1]),
         bias=0,
         learning_rate=0.005,
-        epochs=5000,
+        epochs=2500,
     )
 
     y_pred = predict(X_test, weights, bias)
     r2 = r2score(y_pred, y_test)
-    print(f'r2: {r2}')
-    error = mean_absolute_percentage_error(y_test, y_pred)
-    print(f'MAPE: {error}')
+    print(f'r^2: {r2}')
+    mae = mean_absolute_error(y_test, y_pred) * 100 / mean(y_test)
+    print(f'MAE (%): {mae}')
+    mse = mean_squared_error(y_test, y_pred, squared=True) * 100 / mean(y_test) ** 2
+    print(f'MSE (%): {mse}')
 
     # plt.scatter(X[:, 0], y, color=(1, 0, 0, 0.25), edgecolors='none')
     # plt.plot(X_test, y_pred, color='blue')
@@ -76,11 +88,11 @@ def run(X, y):
 
 def remove_outliers(data):
     cols = [
-        # 'budget',
+        'budget',
         # 'director_impact',
         # 'star_impact',
-        'company_impact',
-        'revenue',
+        # 'company_impact',
+        # 'revenue',
     ]
 
     Q1 = data[cols].quantile(0.25)
@@ -97,7 +109,6 @@ def remove_outliers(data):
 dataset_path = 'data/dataset.csv'
 
 if isfile(dataset_path):
-    print('Reading dataset...')
     data = pd.read_csv(dataset_path)
     print(f'Data size: {len(data)}')
 

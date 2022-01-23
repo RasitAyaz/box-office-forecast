@@ -36,9 +36,9 @@ def calculate_impact(list, json, date):
 
 
 headers = [
-    # 'budget',
-    # 'director_impact',
-    # 'star_impact',
+    'budget',
+    'director_impact',
+    'star_impact',
     'company_impact',
     'revenue',
 ]
@@ -59,9 +59,9 @@ with open('data/dataset.csv', 'w', newline='') as dataset:
                 companies = movie['production_companies']
 
                 writer.writerow([
-                    # movie['budget'],
-                    # calculate_impact(directors, directors_json, date),
-                    # calculate_impact(stars, stars_json, date),
+                    movie['budget'],
+                    calculate_impact(directors, directors_json, date),
+                    calculate_impact(stars, stars_json, date),
                     calculate_impact(companies, companies_json, date),
                     movie['revenue'],
                 ])
