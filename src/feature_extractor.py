@@ -2,66 +2,49 @@ from genericpath import isfile
 import json
 
 
+n_stars = 5
+
 directors = {}
 stars = {}
+companies = {}
 
 
-def update_director(director, date, value):
-    id = director['id']
-    new_credit = {
-        'date': date,
-        'value': value,
-    }
-    if id not in directors:
-        directors[id] = {
-            'name': director['name'],
-            'credits': [new_credit],
-        }
+def add_credit(credits: list, new_credit):
+    for index, credit in enumerate(credits):
+        if new_credit['date'] < credit['date']:
+            credits.insert(index, new_credit)
+            return
+    credits.append(new_credit)
+
+
+def update_impact(item, items, new_credit):
+    id = item['id']
+    if id not in items:
+        items[id] = {'name': item['name'], 'credits': [new_credit]}
     else:
-        credits: list = directors[id]['credits']
-        for index, credit in enumerate(credits):
-            if new_credit['date'] < credit['date']:
-                credits.insert(index, new_credit)
-                return
-        credits.append(new_credit)
-
-
-def update_star(star, date, value):
-    id = star['id']
-    new_credit = {
-        'date': date,
-        'value': value,
-    }
-    if id not in stars:
-        stars[id] = {
-            'name': star['name'],
-            'credits': [new_credit],
-        }
-    else:
-        credits: list = stars[id]['credits']
-        for index, credit in enumerate(credits):
-            if new_credit['date'] < credit['date']:
-                credits.insert(index, new_credit)
-                return
-        credits.append(new_credit)
+        add_credit(items[id]['credits'], new_credit)
 
 
 def extract(movies):
     for movie in movies:
-        profit = movie['revenue'] - movie['budget']
         date = movie['release_date']
-        for i in range(min(5, len(movie['cast']))):
-            update_star(movie['cast'][i], date, profit)
+        profit = movie['revenue'] - movie['budget']
+        new_credit = {'date': date, 'value': profit}
+
+        for i in range(min(n_stars, len(movie['cast']))):
+            update_impact(movie['cast'][i], stars, new_credit)
+
         for person in movie['crew']:
             if person['job'] == 'Director':
-                update_director(person, date, profit)
+                update_impact(person, directors, new_credit)
+
+        for company in movie['production_companies']:
+            update_impact(company, companies, new_credit)
 
 
-def store():
-    with open('data/directors.json', 'w') as outfile:
-        outfile.write(json.dumps(directors, indent=4))
-    with open('data/stars.json', 'w') as outfile:
-        outfile.write(json.dumps(stars, indent=4))
+def store(title, values):
+    with open(f'data/{title}.json', 'w') as outfile:
+        outfile.write(json.dumps(values, indent=4))
 
 
 for year in range(1990, 2020):
@@ -69,6 +52,8 @@ for year in range(1990, 2020):
     if isfile(path):
         movies = json.load(open(path))
         extract(movies)
-        store()
+        store('directors', directors)
+        store('stars', stars)
+        store('companies', companies)
     else:
         print(f'{path} could not be found.')

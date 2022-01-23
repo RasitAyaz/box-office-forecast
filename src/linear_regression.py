@@ -1,3 +1,4 @@
+from genericpath import isfile
 from importlib_metadata import csv
 import pandas as pd
 import numpy as np
@@ -50,11 +51,6 @@ def predict(X: np.ndarray, weights, bias):
 
 
 def run(X, y):
-    X_train: np.ndarray
-    X_test: np.ndarray
-    y_train: np.ndarray
-    y_test: np.ndarray
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=100
     )
@@ -63,25 +59,56 @@ def run(X, y):
         X_train, y_train,
         weights=np.random.randn(X_train.shape[1]),
         bias=0,
-        learning_rate=0.001,
-        epochs=2000,
+        learning_rate=0.005,
+        epochs=5000,
     )
 
     y_pred = predict(X_test, weights, bias)
     r2 = r2score(y_pred, y_test)
     print(f'r2: {r2}')
     error = mean_absolute_percentage_error(y_test, y_pred)
-    print(f'error: {error}')
-    # plt.scatter(X[:, 0], y)
+    print(f'MAPE: {error}')
+
+    # plt.scatter(X[:, 0], y, color=(1, 0, 0, 0.25), edgecolors='none')
+    # plt.plot(X_test, y_pred, color='blue')
     # plt.show()
 
 
-data = pd.read_csv('data/dataset.csv')
+def remove_outliers(data):
+    cols = [
+        # 'budget',
+        # 'director_impact',
+        # 'star_impact',
+        'company_impact',
+        'revenue',
+    ]
 
-X = data.iloc[:, 0:-1]
-y = data.iloc[:, -1]
+    Q1 = data[cols].quantile(0.25)
+    Q3 = data[cols].quantile(0.75)
+    IQR = Q3 - Q1
+    data = data[~((data[cols] < (Q1 - 1.5 * IQR)) |
+                  (data[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
 
-sc = StandardScaler()
-X = sc.fit_transform(X)
+    print(f'Data size after outlier removal: {len(data)}')
 
-run(X, y)
+    return data
+
+
+dataset_path = 'data/dataset.csv'
+
+if isfile(dataset_path):
+    print('Reading dataset...')
+    data = pd.read_csv(dataset_path)
+    print(f'Data size: {len(data)}')
+
+    data = remove_outliers(data)
+
+    X = data.iloc[:, 0:-1]
+    y = data.iloc[:, -1]
+
+    sc = StandardScaler()
+    X = sc.fit_transform(X)
+
+    run(X, y)
+else:
+    print(f'{dataset_path} could not be found.')

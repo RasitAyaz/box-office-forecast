@@ -8,7 +8,8 @@ from numpy.core.fromnumeric import size
 years = list(range(1990, 2020))
 genres = {}
 num_of_films = [0 for _ in range(30)]
-box_offices = [[] for _ in range(30)]
+budgets = [[] for _ in range(30)]
+revenues = [[] for _ in range(30)]
 runtime_vs_revenue = []
 budget_vs_revenue = []
 
@@ -19,7 +20,8 @@ def read_data():
         movies = json.load(open(f'data/years/{year}.json'))
         for movie in movies:
             num_of_films[index] += 1
-            box_offices[index].append(movie['revenue'])
+            budgets[index].append(movie['budget'])
+            revenues[index].append(movie['revenue'])
             runtime_vs_revenue.append((movie['runtime'], movie['revenue']))
             budget_vs_revenue.append((movie['budget'], movie['revenue']))
 
@@ -55,18 +57,25 @@ def plot_rate_of_movies_for_genres():
     plt.ylabel('rate of the movies in a genre')
 
 
-def plot_box_office_boxplot():
-    plt.boxplot(box_offices, flierprops=dict(marker='o', markerfacecolor=(1, 0, 0, 0.25), markeredgecolor='none', markersize=6), showfliers=True)
+def plot_budget_boxplot():
+    plt.boxplot(revenues, flierprops=dict(marker='o', markerfacecolor=(1, 0, 0, 0.25), markeredgecolor='none', markersize=6), showfliers=False)
     plt.xticks(range(1, 31), years, rotation=70)
     plt.xlabel('year')
-    plt.ylabel('box office revenue (million $)')
+    plt.ylabel('box office budget ($)')
+
+
+def plot_revenue_boxplot():
+    plt.boxplot(revenues, flierprops=dict(marker='o', markerfacecolor=(1, 0, 0, 0.25), markeredgecolor='none', markersize=6), showfliers=True)
+    plt.xticks(range(1, 31), years, rotation=70)
+    plt.xlabel('year')
+    plt.ylabel('box office revenue ($)')
 
 
 def plot_runtime_vs_revenue():
     for point in runtime_vs_revenue:
         plt.scatter(point[0], point[1], color='green', alpha=0.1, edgecolors='none')
     plt.xlabel('runtime (minutes)')
-    plt.ylabel('box office revenue (million $)')
+    plt.ylabel('box office revenue ($)')
 
 
 def plot_budget_vs_revenue():
@@ -75,11 +84,11 @@ def plot_budget_vs_revenue():
         y = float(point[1]) / 1000000.0
         if x <= 100 and y <= 300:
             plt.scatter(x, y, color='green', alpha=0.1, edgecolors='none', s=10)
-    plt.xlabel('budget (million $)')
+    plt.xlabel('budget ($)')
     plt.ticklabel_format(useOffset=False)
-    plt.ylabel('box office revenue (million $)')
+    plt.ylabel('box office revenue ($)')
 
 
 read_data()
-plot_box_office_boxplot()
+plot_budget_boxplot()
 plt.show()
