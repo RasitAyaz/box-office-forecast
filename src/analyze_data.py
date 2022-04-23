@@ -25,7 +25,7 @@ def count_non_null_data():
 
 
 def calculate_correlation(data):
-    x = data['genre_impact']
+    x = data['company_impact']
     y = data['revenue']
     x.corr(y, method='spearman')
     test_stats, p_value = pearsonr(x, y)
