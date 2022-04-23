@@ -12,10 +12,10 @@ def read_json_file(path):
         exit()
 
 
-directors_json = read_json_file('data/directors.json')
-stars_json = read_json_file('data/stars.json')
-companies_json = read_json_file('data/companies.json')
-genres_json = read_json_file('data/genres.json')
+directors_json = read_json_file('server/data/directors.json')
+stars_json = read_json_file('server/data/stars.json')
+companies_json = read_json_file('server/data/companies.json')
+genres_json = read_json_file('server/data/genres.json')
 
 
 def calculate_impact(list, json, date):
@@ -58,11 +58,11 @@ headers = [
     'revenue',
 ]
 
-with open('data/dataset.csv', 'w', newline='') as dataset:
+with open('server/data/dataset.csv', 'w', newline='') as dataset:
     writer = csv.writer(dataset)
     writer.writerow(headers)
     for year in range(1990, 2020):
-        movies = read_json_file(f'data/years/{year}.json')
+        movies = read_json_file(f'server/data/years/{year}.json')
         for movie in movies:
             date = movie['release_date']
             directors = [p for p in movie['crew']

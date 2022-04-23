@@ -4,7 +4,7 @@ import json
 
 api_url = 'https://api.themoviedb.org/3'
 api_key = None
-keys_path = 'assets/keys.json'
+keys_path = 'server/assets/keys.json'
 if isfile(keys_path):
     data = json.load(open(keys_path))
     api_key = data['tmdb_api_key']
@@ -84,7 +84,7 @@ def get_movies_by_year(year):
         print(f'{response.status_code}: Could not get the first page.')
 
     print(f'{len(movies)} movies fetched for the year {year}.')
-    filename = f'data/years/{year}.json'
+    filename = f'server/data/years/{year}.json'
     with open(filename, 'w') as outfile:
         print(f'Storing movies in {filename}...')
         outfile.write(json.dumps(movies, indent=4))

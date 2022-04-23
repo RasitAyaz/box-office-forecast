@@ -141,13 +141,13 @@ def store_model(model, headers: list):
     values: list = model['weights']
     values.insert(0, model['bias'])
 
-    with open('models/linear_regression.csv', 'w', newline='') as model_file:
+    with open('server/models/linear_regression.csv', 'w', newline='') as model_file:
         writer = csv.writer(model_file)
         writer.writerow(headers)
         writer.writerow(values)
 
 
-dataset_path = 'data/dataset.csv'
+dataset_path = 'server/data/dataset.csv'
 
 if isfile(dataset_path):
     data = pd.read_csv(dataset_path)
