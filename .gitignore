@@ -290,4 +290,4 @@ $RECYCLE.BIN/
 
 data/
 models/
-assets/keys.json
+*keys.json
