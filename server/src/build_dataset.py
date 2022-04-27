@@ -121,4 +121,4 @@ with open(dataset_path, 'w', newline='') as dataset:
                 ])
 
 data = pd.read_csv(dataset_path)
-remove_outliers(data).to_csv(dataset_path)
+remove_outliers(data).to_csv(dataset_path, index=False)
