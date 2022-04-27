@@ -66,26 +66,19 @@ class SVR(object):
 
         return self
 
-def predict(self, X, y=None):
-        
-    if len(X.shape) == 1:
-        X = X.reshape(-1, 1)
+    def predict(self, X, y=None):
+            
+        if len(X.shape) == 1:
+            X = X.reshape(-1, 1)
 
-        y_pred = self.sess.run(
-            self.y_pred,
-            {
-                self.X: X
-            }
-        )
-        return y_pred
+            y_pred = self.sess.run(
+                self.y_pred,
+                {
+                    self.X: X
+                }
+            )
+            return y_pred
    
-def r2score(y_pred, y):
-        
-    rss = np.sum((y_pred - y) ** 2)
-    tss = np.sum((y-y.mean()) ** 2)
-
-    r2 = 1 - (rss / tss)
-    return r2
 
 dataset_path = 'server/data/dataset.csv'
 
@@ -101,11 +94,12 @@ if isfile(dataset_path):
     X, y, test_size=0.25, random_state=100
     )
 
-    from sklearn.svm import SVR
-    svr_linear = SVR(kernel='linear',gamma='scale', C=1.0, epsilon=0.1)
-    svr_linear.fit(X_train, y_train) 
     
-    svr_linear.score(X_test,y_test)
+    model = SVR(epsilon=0.2)
+    model.fit(X_train, y_train)
+    
+    print(model.predict(X_test))
+    
 
 else:
     print('Dataset not found ')
