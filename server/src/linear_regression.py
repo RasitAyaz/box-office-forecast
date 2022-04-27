@@ -114,27 +114,6 @@ def build_model(X, y):
     # plt.show()
 
 
-def remove_outliers(data):
-    cols = [
-        'budget',
-        # 'director_impact',
-        # 'star_impact',
-        # 'company_impact',
-        # 'genre_impact',
-        # 'revenue',
-    ]
-
-    Q1 = data[cols].quantile(0.25)
-    Q3 = data[cols].quantile(0.75)
-    IQR = Q3 - Q1
-    data = data[~((data[cols] < (Q1 - 1.5 * IQR)) |
-                  (data[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
-
-    print(f'Data size after outlier removal: {len(data)}')
-
-    return data
-
-
 def store_model(model, headers: list):
     # Remove revenue header
     headers.pop()
@@ -144,19 +123,17 @@ def store_model(model, headers: list):
     values: list = model['weights']
     values.insert(0, model['bias'])
 
-    with open(f'{current_path}/models/linear_regression.csv', 'w', newline='') as model_file:
+    with open(f'{current_path}/../models/linear_regression.csv', 'w', newline='') as model_file:
         writer = csv.writer(model_file)
         writer.writerow(headers)
         writer.writerow(values)
 
 
-dataset_path = f'{current_path}/data/dataset.csv'
+dataset_path = f'{current_path}/../data/dataset.csv'
 
 if isfile(dataset_path):
     data = pd.read_csv(dataset_path)
     print(f'Data size: {len(data)}')
-
-    data = remove_outliers(data)
 
     X = data.iloc[:, 0:-1]
     y = data.iloc[:, -1]

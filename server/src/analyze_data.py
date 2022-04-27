@@ -15,7 +15,7 @@ def count_non_null_data():
 
     for year in years:
         index = year - years[0]
-        movies = json.load(open(f'{current_path}/data/years/{year}.json'))
+        movies = json.load(open(f'{current_path}/../data/years/{year}.json'))
         count['total'] += len(movies)
         for movie in movies:
             for feature in ['budget', 'revenue', 'genres', 'runtime', 'production_countries', 'production_companies', 'imdb_id']:
@@ -35,7 +35,7 @@ def calculate_correlation(data):
     print('%.4f, %.4f' % (test_stats, p_value))
 
 
-dataset_path = f'{current_path}/data/dataset.csv'
+dataset_path = f'{current_path}/../data/dataset.csv'
 
 if isfile(dataset_path):
     print('Reading dataset...')

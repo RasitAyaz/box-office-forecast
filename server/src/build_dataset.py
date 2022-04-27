@@ -1,8 +1,10 @@
 import csv
-from datetime import datetime
-from genericpath import isfile
 import json
 import os
+from datetime import datetime
+
+from genericpath import isfile
+import pandas as pd
 
 current_path = os.path.dirname(__file__)
 
@@ -15,10 +17,10 @@ def read_json_file(path):
         exit()
 
 
-directors_json = read_json_file(f'{current_path}/data/directors.json')
-stars_json = read_json_file(f'{current_path}/data/stars.json')
-companies_json = read_json_file(f'{current_path}/data/companies.json')
-genres_json = read_json_file(f'{current_path}/data/genres.json')
+directors_json = read_json_file(f'{current_path}/../data/directors.json')
+stars_json = read_json_file(f'{current_path}/../data/stars.json')
+companies_json = read_json_file(f'{current_path}/../data/companies.json')
+genres_json = read_json_file(f'{current_path}/../data/genres.json')
 
 
 def calculate_growing_impact(list, json, date):
@@ -62,22 +64,49 @@ headers = [
     'revenue',
 ]
 
-with open(f'{current_path}/data/dataset.csv', 'w', newline='') as dataset:
+
+def remove_outliers(data):
+    cols = [
+        'budget',
+        # 'director_impact',
+        # 'star_impact',
+        # 'company_impact',
+        # 'genre_impact',
+        # 'revenue',
+    ]
+
+    Q1 = data[cols].quantile(0.25)
+    Q3 = data[cols].quantile(0.75)
+    IQR = Q3 - Q1
+    data = data[~((data[cols] < (Q1 - 1.5 * IQR)) |
+                  (data[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+    print(f'Data size after outlier removal: {len(data)}')
+
+    return data
+
+
+dataset_path = f'{current_path}/../data/dataset.csv'
+
+with open(dataset_path, 'w', newline='') as dataset:
     writer = csv.writer(dataset)
     writer.writerow(headers)
     for year in range(1990, 2020):
-        movies = read_json_file(f'{current_path}/data/years/{year}.json')
-        for movie in movies:
+        movies: dict
+        movies = read_json_file(f'{current_path}/../data/years/{year}.json')
+        for id, movie in movies.items():
             date = movie['release_date']
             directors = [p for p in movie['crew']
                          if p['job'] == 'Director']
             stars = movie['cast'][:5]
+            if len(stars) == 0:
+                continue
             companies = movie['production_companies']
             genres = movie['genres']
             producer_count = 0
 
             for person in movie['crew']:
-                if 'produc' in person['job'].lower():
+                if person['department'] == 'Production':
                     producer_count += 1
 
             if len(companies) > 0 and len(genres) > 0:
@@ -90,3 +119,6 @@ with open(f'{current_path}/data/dataset.csv', 'w', newline='') as dataset:
                     producer_count,
                     movie['revenue'],
                 ])
+
+data = pd.read_csv(dataset_path)
+remove_outliers(data).to_csv(dataset_path)

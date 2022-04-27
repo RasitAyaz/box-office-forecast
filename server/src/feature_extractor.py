@@ -69,12 +69,12 @@ def calculate_genre_values():
 
 
 def store(title, values):
-    with open(f'{current_path}/data/{title}.json', 'w') as outfile:
+    with open(f'{current_path}/../data/{title}.json', 'w') as outfile:
         outfile.write(json.dumps(values, indent=4))
 
 
 for year in range(1990, 2020):
-    path = f'{current_path}/data/years/{year}.json'
+    path = f'{current_path}/../data/years/{year}.json'
     if isfile(path):
         movies_of_year = json.load(open(path))
         extract(movies_of_year)

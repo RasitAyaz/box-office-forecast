@@ -18,6 +18,8 @@ else:
 
 def get_movie_details_in_page(page_json, movies: dict):
     for movie in page_json['results']:
+        if str(movie['id']) in movies:
+            continue
         url = f'{api_url}/movie/{movie["id"]}?api_key={api_key}&append_to_response=credits'
         response = requests.get(url)
         if response.ok:
@@ -60,10 +62,10 @@ def get_movie_details_in_page(page_json, movies: dict):
 
     return True
 
-def store_movies(movies, path):
+def store_movies(movies, path, year):
     with open(path, 'w') as outfile:
         outfile.write(json.dumps(movies, indent=4))
-        print(f'Stored {len(movies)} movies in {path}...\n')
+        print(f'Stored {len(movies)} movies in {year}.json.\n')
 
 
 def get_movies_by_year(year, init_page_num):
@@ -76,28 +78,31 @@ def get_movies_by_year(year, init_page_num):
     # Release type 3 means theatrical release
     url = f'{api_url}/discover/movie?api_key={api_key}&primary_release_year={year}&with_release_type=3&sort_by=vote_count.desc'
     page_url = f'{url}&page={init_page_num}'
-    response = requests.get(page_url)
-    if response.ok:
-        init_page = json.loads(response.text)
-        total_pages = init_page['total_pages']
-        get_movie_details_in_page(init_page, movies)
-        store_movies(movies, path)
-        for page_num in range(init_page_num + 1, total_pages + 1):
-            page_url = f'{url}&page={page_num}'
-            print(f'Fetching page {page_num}...')
-            page_response = requests.get(page_url)
-            if page_response.ok:
-                page = json.loads(page_response.text)
-                continue_fetching = get_movie_details_in_page(page, movies)
-                store_movies(movies, path)
-                if not continue_fetching:
-                    break
-            else:
-                print(f'{response.status_code}: Could not get page {page_num}.')
-    else:
-        print(f'{response.status_code}: Could not get the initial page.')
+    try:
+        response = requests.get(page_url)
+        if response.ok:
+            init_page = json.loads(response.text)
+            total_pages = init_page['total_pages']
+            get_movie_details_in_page(init_page, movies)
+            store_movies(movies, path, year)
+            for page_num in range(init_page_num + 1, total_pages + 1):
+                page_url = f'{url}&page={page_num}'
+                print(f'Fetching page {page_num}...')
+                page_response = requests.get(page_url)
+                if page_response.ok:
+                    page = json.loads(page_response.text)
+                    continue_fetching = get_movie_details_in_page(page, movies)
+                    store_movies(movies, path, year)
+                    if not continue_fetching:
+                        break
+                else:
+                    print(f'{response.status_code}: Could not get page {page_num}.')
+        else:
+            print(f'{response.status_code}: Could not get the initial page.')
+    except:
+        print('ERROR')
 
-    print(f'\n{len(movies)} movies fetched for the year {year}.')
+    print(f'{len(movies)} movies fetched for the year {year}.')
 
 
 print('Year: ', end='')

@@ -20,7 +20,7 @@ budget_vs_revenue = []
 def read_data():
     for year in years:
         index = year - years[0]
-        movies = json.load(open(f'{current_path}/data/years/{year}.json'))
+        movies = json.load(open(f'{current_path}/../data/years/{year}.json'))
         for movie in movies:
             num_of_films[index] += 1
             budgets[index].append(movie['budget'])
