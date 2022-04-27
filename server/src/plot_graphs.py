@@ -1,8 +1,11 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import json
 
 from numpy.core.fromnumeric import size
+
+current_path = os.path.dirname(__file__)
 
 
 years = list(range(1990, 2020))
@@ -17,7 +20,7 @@ budget_vs_revenue = []
 def read_data():
     for year in years:
         index = year - years[0]
-        movies = json.load(open(f'server/data/years/{year}.json'))
+        movies = json.load(open(f'{current_path}/data/years/{year}.json'))
         for movie in movies:
             num_of_films[index] += 1
             budgets[index].append(movie['budget'])

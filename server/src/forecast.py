@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def use_linear_regression():
-    model_path = 'server/models/linear_regression.csv'
+    model_path = f'{current_path}/models/linear_regression.csv'
 
     if isfile(model_path):
         data = pd.read_csv(model_path)

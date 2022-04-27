@@ -2,6 +2,9 @@ import csv
 from datetime import datetime
 from genericpath import isfile
 import json
+import os
+
+current_path = os.path.dirname(__file__)
 
 
 def read_json_file(path):
@@ -12,13 +15,13 @@ def read_json_file(path):
         exit()
 
 
-directors_json = read_json_file('server/data/directors.json')
-stars_json = read_json_file('server/data/stars.json')
-companies_json = read_json_file('server/data/companies.json')
-genres_json = read_json_file('server/data/genres.json')
+directors_json = read_json_file(f'{current_path}/data/directors.json')
+stars_json = read_json_file(f'{current_path}/data/stars.json')
+companies_json = read_json_file(f'{current_path}/data/companies.json')
+genres_json = read_json_file(f'{current_path}/data/genres.json')
 
 
-def calculate_impact(list, json, date):
+def calculate_growing_impact(list, json, date):
     impact_sum = 0
 
     for item in list:
@@ -55,28 +58,35 @@ headers = [
     'star_impact',
     'company_impact',
     # 'genre_impact',
+    'producer_count',
     'revenue',
 ]
 
-with open('server/data/dataset.csv', 'w', newline='') as dataset:
+with open(f'{current_path}/data/dataset.csv', 'w', newline='') as dataset:
     writer = csv.writer(dataset)
     writer.writerow(headers)
     for year in range(1990, 2020):
-        movies = read_json_file(f'server/data/years/{year}.json')
+        movies = read_json_file(f'{current_path}/data/years/{year}.json')
         for movie in movies:
             date = movie['release_date']
             directors = [p for p in movie['crew']
-                            if p['job'] == 'Director']
+                         if p['job'] == 'Director']
             stars = movie['cast'][:5]
             companies = movie['production_companies']
             genres = movie['genres']
+            producer_count = 0
+
+            for person in movie['crew']:
+                if 'produc' in person['job'].lower():
+                    producer_count += 1
 
             if len(companies) > 0 and len(genres) > 0:
                 writer.writerow([
                     movie['budget'],
-                    calculate_impact(directors, directors_json, date),
-                    calculate_impact(stars, stars_json, date),
-                    calculate_impact(companies, companies_json, date),
+                    calculate_growing_impact(directors, directors_json, date),
+                    calculate_growing_impact(stars, stars_json, date),
+                    calculate_growing_impact(companies, companies_json, date),
                     # calculate_genre_impact(genres),
+                    producer_count,
                     movie['revenue'],
                 ])

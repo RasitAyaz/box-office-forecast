@@ -1,7 +1,10 @@
 from genericpath import isfile
 import json
+import os
 import pandas as pd
 from scipy.stats.stats import pearsonr
+
+current_path = os.path.dirname(__file__)
 
 
 def count_non_null_data():
@@ -12,7 +15,7 @@ def count_non_null_data():
 
     for year in years:
         index = year - years[0]
-        movies = json.load(open(f'server/data/years/{year}.json'))
+        movies = json.load(open(f'{current_path}/data/years/{year}.json'))
         count['total'] += len(movies)
         for movie in movies:
             for feature in ['budget', 'revenue', 'genres', 'runtime', 'production_countries', 'production_companies', 'imdb_id']:
@@ -32,7 +35,7 @@ def calculate_correlation(data):
     print('%.4f, %.4f' % (test_stats, p_value))
 
 
-dataset_path = 'server/data/dataset.csv'
+dataset_path = f'{current_path}/data/dataset.csv'
 
 if isfile(dataset_path):
     print('Reading dataset...')

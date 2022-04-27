@@ -1,5 +1,6 @@
 from genericpath import isfile
 import json
+import os
 from statistics import mean
 from importlib_metadata import csv
 import pandas as pd
@@ -8,6 +9,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+current_path = os.path.dirname(__file__)
 
 
 def read_dataset():
@@ -141,13 +144,13 @@ def store_model(model, headers: list):
     values: list = model['weights']
     values.insert(0, model['bias'])
 
-    with open('server/models/linear_regression.csv', 'w', newline='') as model_file:
+    with open(f'{current_path}/models/linear_regression.csv', 'w', newline='') as model_file:
         writer = csv.writer(model_file)
         writer.writerow(headers)
         writer.writerow(values)
 
 
-dataset_path = 'server/data/dataset.csv'
+dataset_path = f'{current_path}/data/dataset.csv'
 
 if isfile(dataset_path):
     data = pd.read_csv(dataset_path)
