@@ -1,28 +1,18 @@
-import { useEffect, useState } from "react";
-import api from "../../api";
+import { ScrollMenu } from 'react-horizontal-scrolling-menu';
 import MovieCard from "./MovieCard";
 
-function UpcomingMovies() {
-
-  const [movies, setMovies] = useState([]);
-
-  useEffect(() => {
-    fetch(api.tmdb + '/trending/movie/week?api_key=' + api.tmdbKey)
-      .then(res => res.json())
-      .then(res => {
-        setMovies(res['results']);
-        console.log(movies);
-      });
-  }, []);
+function UpcomingMovies({ movies }) {
 
   return (
-    <div style={{ padding: "30px", display: "flex" }}>
-      {movies.map(
-        movie => <div style={{ padding: "20px" }}>
-          <MovieCard movie={movie} />
-        </div>
-      )}
-    </div>
+    <ScrollMenu>
+      <div style={{ padding: "30px", display: "flex" }}>
+        {movies.map(
+          movie => <div style={{ padding: "20px" }}>
+            <MovieCard movie={movie} />
+          </div>
+        )}
+      </div>
+    </ScrollMenu>
   );
 }
 

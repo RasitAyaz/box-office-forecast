@@ -1,7 +1,34 @@
+:root {
+	--backgroundColor: #191A19;
+	--primaryColorDark: #1E5128;
+	--primaryColor: #4E9F3D;
+	--primaryColorLight: #D8E9A8;
+}
+
 .center {
 	display: flex;
 	align-items: center;
 	justify-content: center;
     height: 100%;
     margin: 0;
+}
+
+.bottomLeft {
+	display: flex;
+	align-items: flex-end;
+	justify-content: start;
+    height: 100%;
+    margin: 0;
+}
+
+.bottomRight {
+	display: flex;
+	align-items: flex-end;
+	justify-content: end;
+    height: 100%;
+    margin: 0;
+}
+
+.card {
+	border-radius: 10px;
 }
