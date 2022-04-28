@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -14,8 +13,9 @@ def initialize_params(layer_sizes):
     params = {}
     for i in range(1, len(layer_sizes)):
         params['W' + str(i)] = np.random.randn(layer_sizes[i],
-                                               layer_sizes[i-1])*0.01
-        params['B' + str(i)] = np.random.randn(layer_sizes[i], 1)*0.01
+                                               layer_sizes[i-1])
+        params['B' + str(i)] = np.random.randn(layer_sizes[i], 1)
+    print(params)
     return params
 
 
@@ -34,14 +34,13 @@ def forward_propagation(X_train, params):
                 values['A' + str(i)] = values['Z' + str(i)]
             else:
                 values['A' + str(i)] = relu(values['Z' + str(i)])
-        print(values[i])
     return values
 
 
 def compute_cost(values, Y_train):
     layers = len(values)//2
     Y_pred = values['A' + str(layers)]
-    cost = 1/(2*len(Y_train)) * np.sum(np.square(Y_pred - Y_train))
+    cost = (1/(2*len(Y_train))) * np.sum(np.square(Y_pred - Y_train))
     return cost
 
 
@@ -82,8 +81,8 @@ def model(X_train, Y_train, layer_sizes, num_iters, learning_rate):
         values = forward_propagation(X_train.T, params)
         cost = compute_cost(values, Y_train.T)
         grads = backward_propagation(params, values, X_train.T, Y_train.T)
-        params = update_params(params, grads, learning_rate)
-        # print('Cost at iteration ' + str(i+1) + ' = ' + str(cost) + '\n')
+        #params = update_params(params, grads, learning_rate)
+        print('Cost at iteration ' + str(i+1) + ' = ' + str(cost) + '\n')
     return params
 
 
@@ -103,7 +102,7 @@ def predict(X, params):
     return predictions
 
 
-dataset_path = 'server/dataset.csv'
+dataset_path = 'server/data/dataset.csv'
 data = pd.read_csv(dataset_path)
 
 X = data.iloc[:, 0:-1].values
@@ -114,8 +113,9 @@ num_iters = 100
 learning_rate = 0.005
 
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.20)
+
 params = model(X_train, Y_train, layer_sizes, num_iters,learning_rate)  # train the model
-print(params)
+
 train_acc, test_acc = compute_accuracy(X_train, X_test, Y_train, Y_test, params)  # get training and test accuracy
-# print('Root Mean Squared Error on Training Data = ' + str(train_acc))
-# print('Root Mean Squared Error on Test Data = ' + str(test_acc))
+print('Root Mean Squared Error on Training Data = ' + str(train_acc))
+print('Root Mean Squared Error on Test Data = ' + str(test_acc))
