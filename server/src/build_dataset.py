@@ -86,7 +86,7 @@ def remove_outliers(data):
     return data
 
 
-dataset_path = f'{current_path}/../data/dataset.csv'
+dataset_path = f'{current_path}/../dataset.csv'
 
 with open(dataset_path, 'w', newline='') as dataset:
     writer = csv.writer(dataset)

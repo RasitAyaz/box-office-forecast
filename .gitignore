@@ -325,3 +325,4 @@ $RECYCLE.BIN/
 data/
 models/
 *keys.json
+*api.js

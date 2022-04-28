@@ -103,7 +103,7 @@ def predict(X, params):
     return predictions
 
 
-dataset_path = 'server/data/dataset.csv'
+dataset_path = 'server/dataset.csv'
 data = pd.read_csv(dataset_path)
 
 X = data.iloc[:, 0:-1].values

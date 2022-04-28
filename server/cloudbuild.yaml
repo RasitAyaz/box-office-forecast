@@ -1,0 +1,3 @@
+steps:
+  - name: gcr.io/box-office-forecast/box-office-forecast
+  args: ['deploy', '--project=box-office-forecast', '--only=hosting']

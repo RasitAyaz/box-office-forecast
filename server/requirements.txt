@@ -1,0 +1,9 @@
+Flask
+gunicorn
+pandas
+sklearn
+scipy
+numpy
+matplotlib
+importlib_metadata
+requests

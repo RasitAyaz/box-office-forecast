@@ -129,7 +129,7 @@ def store_model(model, headers: list):
         writer.writerow(values)
 
 
-dataset_path = f'{current_path}/../data/dataset.csv'
+dataset_path = f'{current_path}/../dataset.csv'
 
 if isfile(dataset_path):
     data = pd.read_csv(dataset_path)

@@ -1,9 +1,10 @@
 import Card from '@mui/material/Card';
+import api from '../../api';
 
-function MovieCard() {
+function MovieCard({ movie }) {
   return (
     <Card style={{ height: "225px", width: "150px" }}>
-      <div className='center'>Movie</div>
+      <img style={{ maxHeight: "100%", margin: "auto"}} src={api.tmdbImage + movie['poster_path']} />
     </Card>
   );
 }
