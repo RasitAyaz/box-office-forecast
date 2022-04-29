@@ -5,6 +5,10 @@
 	--primaryColorLight: #D8E9A8;
 }
 
+body {
+	color: white;
+}
+
 .center {
 	display: flex;
 	align-items: center;
