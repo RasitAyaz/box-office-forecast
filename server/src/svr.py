@@ -6,19 +6,13 @@ import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from statistics import mean
 
-dataset_path = 'server/data/dataset.csv'
+dataset_path = 'server/dataset.csv'
 data = pd.read_csv(dataset_path)
 X = data.iloc[: ,0:-1].values
 y = data.iloc[:, -1].values
 
 print("X values",X)
 print("y values",y)
-
-print(X.shape)
-print(y.shape)
-
-print(type(X))
-print(type(y))
 
 X = X.reshape(-1,6)
 y = y.reshape(-1,1)
@@ -38,27 +32,11 @@ X = sc_X.fit_transform(X)
 y = sc_y.fit_transform(y)
 
 
-''' print("X values",X)
-print("y values",y)
-
-print(type(X))
-print(type(y))
- '''
-
 # Step 3 - Fit SVR
 from sklearn.svm import SVR
 regressor = SVR(kernel = "rbf")
 regressor.fit(X_train,y_train.ravel())
 
-
-""" # Step 4 - Visualization
-""" """ import matplotlib.pyplot as plt
-plt.scatter(X, y , color="red")
-plt.plot(X, regressor.predict(X), color="blue")
-plt.title("SVR")
-plt.xlabel("Position")
-plt.ylabel("Salary")
-plt.show() """
 
 def r2score(y_pred, y):
     rss = np.sum((y_pred - y) ** 2)
@@ -83,6 +61,8 @@ print(type(y_test),type(y_pred))
 print(y_pred.size)
 r2 = r2score(y_pred, y_test)
 print(f'r^2: {r2}')
+
+
 
 
 
