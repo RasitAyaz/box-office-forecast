@@ -1,5 +1,6 @@
 :root {
 	--backgroundColor: #191A19;
+	--backgroundColorLight: #2c2e2c;
 	--primaryColorDark: #1E5128;
 	--primaryColor: #4E9F3D;
 	--primaryColorLight: #D8E9A8;
@@ -13,26 +14,40 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-    height: 100%;
-    margin: 0;
+	height: 100%;
+	margin: 0;
 }
 
 .bottomLeft {
 	display: flex;
 	align-items: flex-end;
 	justify-content: start;
-    height: 100%;
-    margin: 0;
+	height: 100%;
+	margin: 0;
 }
 
 .bottomRight {
 	display: flex;
 	align-items: flex-end;
 	justify-content: end;
-    height: 100%;
-    margin: 0;
+	height: 100%;
+	margin: 0;
 }
 
 .card {
 	border-radius: 10px;
+}
+
+.movie_page_poster {
+	height: 225px;
+	width: 150px;
+	border-radius: 20px;
+	max-height: 100%;
+	margin: auto;
+}
+
+@media screen and (min-width: 0px) and (max-width: 720px) {
+	.movie_page_poster {
+		display: none;
+	}
 }

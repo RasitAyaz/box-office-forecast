@@ -5,7 +5,7 @@ function UpcomingMovies({ movies }) {
 
   return (
     <ScrollMenu>
-      <div style={{ padding: "30px", display: "flex" }}>
+      <div style={{ padding: "20px", display: "flex" }}>
         {movies.map(
           movie => <div style={{ padding: "20px" }}>
             <MovieCard movie={movie} />
