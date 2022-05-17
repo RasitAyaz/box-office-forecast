@@ -67,7 +67,9 @@ def predict(X: np.ndarray, weights, bias):
     return X.dot(weights) + bias
 
 
-def calculate_smape(A, F):
+def calculate_smape(y_test, y_pred):
+    A = np.array(y_test)
+    F = np.array(y_pred)
     return 100/len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))
 
 
@@ -76,18 +78,21 @@ def build_model(X, y):
         X, y, test_size=0.25, random_state=100
     )
 
+    epochs = 10000
+    print(f'number of epochs: {epochs}')
+
     weights, bias, costs = gradient_descent_function(
         X_train, y_train,
         weights=np.random.randn(X_train.shape[1]),
         bias=0,
         learning_rate=0.05,
-        epochs=10000,
+        epochs=epochs,
     )
 
     y_pred = predict(X_test, weights, bias)
     r2 = r2score(y_pred, y_test)
     print(f'r^2: {r2}')
-    smape = calculate_smape(np.array(y_test), np.array(y_pred))
+    smape = calculate_smape(y_test, y_pred)
     print(f'SMAPE (%): {smape}')
 
     # plt.plot(costs)
