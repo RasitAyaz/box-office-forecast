@@ -3,8 +3,9 @@ import json
 import os
 from datetime import datetime
 
-from genericpath import isfile
 import pandas as pd
+from genericpath import isfile
+from sklearn import preprocessing
 
 current_path = os.path.dirname(__file__)
 
@@ -121,4 +122,6 @@ with open(dataset_path, 'w', newline='') as dataset:
                 ])
 
 data = pd.read_csv(dataset_path)
-remove_outliers(data).to_csv(dataset_path, index=False)
+data = remove_outliers(data)
+data = pd.DataFrame(preprocessing.scale(data), columns=headers)
+data.to_csv(dataset_path, index=False)
