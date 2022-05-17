@@ -1,11 +1,12 @@
-from genericpath import isfile
 import json
 import os
 from statistics import mean
-from importlib_metadata import csv
-import pandas as pd
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from genericpath import isfile
+from importlib_metadata import csv
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -80,10 +81,9 @@ def build_model(X, y):
     y_pred = predict(X_test, weights, bias)
     r2 = r2score(y_pred, y_test)
     print(f'r^2: {r2}')
-    mae = mean_absolute_error(y_test, y_pred) * 100 / mean(y_test)
+    mae = mean_absolute_error(y_test, y_pred)
     print(f'MAE (%): {mae}')
-    mse = mean_squared_error(
-        y_test, y_pred, squared=True) * 100 / mean(y_test) ** 2
+    mse = mean_squared_error(y_test, y_pred, squared=True)
     print(f'MSE (%): {mse}')
 
     # plt.plot(costs)

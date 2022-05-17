@@ -24,20 +24,26 @@ companies_json = read_json_file(f'{current_path}/../data/companies.json')
 genres_json = read_json_file(f'{current_path}/../data/genres.json')
 
 
+def get_year(date):
+    return int(date[0:4])
+
+
 def calculate_growing_impact(list, json, date):
     impact_sum = 0
 
     for item in list:
         json_item = json[str(item['id'])]
         value_sum = 0
-        n_credits = 0
+        factor_sum = 0
         for credit in json_item['credits']:
             if credit['date'] > date:
                 break
-            value_sum += credit['value']
-            n_credits += 1
+            year_diff = get_year(date) - get_year(credit['date'])
+            factor = 1 / (year_diff + 1)
+            value_sum += credit['value'] * factor
+            factor_sum += factor
 
-        impact_sum += value_sum / n_credits
+        impact_sum += value_sum / factor_sum
 
     return impact_sum / len(list)
 
