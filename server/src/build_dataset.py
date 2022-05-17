@@ -3,8 +3,10 @@ import json
 import os
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 from genericpath import isfile
+from scipy import stats
 from sklearn import preprocessing
 
 current_path = os.path.dirname(__file__)
@@ -29,6 +31,7 @@ def get_year(date):
 
 
 def calculate_growing_impact(list, json, date):
+    impact_max = 0
     impact_sum = 0
 
     for item in list:
@@ -43,9 +46,13 @@ def calculate_growing_impact(list, json, date):
             value_sum += credit['value'] * factor
             factor_sum += factor
 
-        impact_sum += value_sum / factor_sum
+        impact = value_sum / factor_sum
+        impact_sum += impact
+        impact_max = max(impact_max, impact)
 
-    return impact_sum / len(list)
+    impact_avg = impact_sum / len(list)
+
+    return impact_avg, impact_max
 
 
 def calculate_genre_impact(genres):
@@ -63,34 +70,18 @@ def calculate_genre_impact(genres):
 
 headers = [
     'budget',
-    'director_impact',
-    'star_impact',
-    'company_impact',
+    'director_avg',
+    'director_max',
+    'director_count',
+    'star_avg',
+    'star_max',
+    'company_avg',
+    'company_max',
+    'company_count',
     # 'genre_impact',
     'producer_count',
     'revenue',
 ]
-
-
-def remove_outliers(data):
-    cols = [
-        'budget',
-        # 'director_impact',
-        # 'star_impact',
-        # 'company_impact',
-        # 'genre_impact',
-        # 'revenue',
-    ]
-
-    Q1 = data[cols].quantile(0.25)
-    Q3 = data[cols].quantile(0.75)
-    IQR = Q3 - Q1
-    data = data[~((data[cols] < (Q1 - 1.5 * IQR)) |
-                  (data[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
-
-    print(f'Data size after outlier removal: {len(data)}')
-
-    return data
 
 
 dataset_path = f'{current_path}/../dataset.csv'
@@ -105,10 +96,14 @@ with open(dataset_path, 'w', newline='') as dataset:
             date = movie['release_date']
             directors = [p for p in movie['crew']
                          if p['job'] == 'Director']
-            stars = movie['cast'][:5]
+            stars = movie['cast'][:3]
             if len(stars) == 0:
                 continue
+
             companies = movie['production_companies']
+            if len(companies) == 0:
+                continue
+
             genres = movie['genres']
             producer_count = 0
 
@@ -116,18 +111,45 @@ with open(dataset_path, 'w', newline='') as dataset:
                 if person['department'] == 'Production':
                     producer_count += 1
 
+            director_avg, director_max = calculate_growing_impact(
+                directors, directors_json, date)
+            star_avg, star_max = calculate_growing_impact(
+                stars, stars_json, date)
+            company_avg, company_max = calculate_growing_impact(
+                companies, companies_json, date)
+
             if len(companies) > 0 and len(genres) > 0:
                 writer.writerow([
                     movie['budget'],
-                    calculate_growing_impact(directors, directors_json, date),
-                    calculate_growing_impact(stars, stars_json, date),
-                    calculate_growing_impact(companies, companies_json, date),
+                    director_avg,
+                    director_max,
+                    len(directors),
+                    star_avg,
+                    star_max,
+                    company_avg,
+                    company_max,
+                    len(companies),
                     # calculate_genre_impact(genres),
                     producer_count,
                     movie['revenue'],
                 ])
 
+
+def remove_outliers(data):
+    cols = [
+        'budget'
+    ]
+
+    for col in cols:
+        data = data[(np.abs(stats.zscore(data[col])) < 3)]
+
+    return data
+
+
 data = pd.read_csv(dataset_path)
+print(f'Data size: {len(data)}')
+# Removes all outliers
 data = remove_outliers(data)
+print(f'Data size after outlier removal: {len(data)}')
 data = pd.DataFrame(preprocessing.scale(data), columns=headers)
 data.to_csv(dataset_path, index=False)

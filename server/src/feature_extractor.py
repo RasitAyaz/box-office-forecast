@@ -1,11 +1,12 @@
-from genericpath import isfile
 import json
 import os
 from statistics import mean
 
+from genericpath import isfile
+
 current_path = os.path.dirname(__file__)
 
-n_stars = 5
+n_stars = 6
 n_genres = 1
 
 directors_out = {}
