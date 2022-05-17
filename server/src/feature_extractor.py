@@ -44,8 +44,7 @@ def add_genre_value(genre, new_value):
 def extract(movies: dict):
     for id, movie in movies.items():
         date = movie['release_date']
-        profit = movie['revenue'] - movie['budget']
-        new_credit = {'date': date, 'value': profit}
+        new_credit = {'date': date, 'value': movie['revenue']}
 
         for i in range(min(n_stars, len(movie['cast']))):
             update_impact(movie['cast'][i], stars_out, new_credit)
@@ -58,7 +57,7 @@ def extract(movies: dict):
             update_impact(company, companies_out, new_credit)
 
         for genre in movie['genres'][:n_genres]:
-            add_genre_value(genre, profit)
+            add_genre_value(genre, movie['revenue'])
 
 
 def calculate_genre_values():

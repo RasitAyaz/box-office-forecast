@@ -67,6 +67,10 @@ def predict(X: np.ndarray, weights, bias):
     return X.dot(weights) + bias
 
 
+def calculate_smape(A, F):
+    return 100/len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))
+
+
 def build_model(X, y):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=100
@@ -76,17 +80,15 @@ def build_model(X, y):
         X_train, y_train,
         weights=np.random.randn(X_train.shape[1]),
         bias=0,
-        learning_rate=0.005,
-        epochs=1000,
+        learning_rate=0.05,
+        epochs=10000,
     )
 
     y_pred = predict(X_test, weights, bias)
     r2 = r2score(y_pred, y_test)
     print(f'r^2: {r2}')
-    mape = mean_absolute_percentage_error(y_test, y_pred) * 100
-    print(f'MAPE (%): {mape}')
-    # mse = mean_squared_error(y_test, y_pred, squared=True) * 100 / len(y_test)
-    # print(f'MSE (%): {mse}')
+    smape = calculate_smape(np.array(y_test), np.array(y_pred))
+    print(f'SMAPE (%): {smape}')
 
     # plt.plot(costs)
     # plt.xlabel('epochs')
@@ -144,7 +146,7 @@ if isfile(dataset_path):
     X = sc.fit_transform(X)
 
     model = build_model(X, y)
-    
+
     store_model(model, list(data))
 
 
