@@ -121,10 +121,6 @@ for year in range(1990, 2020):
         if producer_count == 0:
             continue
 
-        if movie['budget'] == 1917:
-            print(movie['title'])
-            print(movie['release_date'])
-
         director_avg, director_max = calculate_growing_impact(
             directors, directors_json, date)
         star_avg, star_max = calculate_growing_impact(
