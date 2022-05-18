@@ -14,8 +14,10 @@ y = data.iloc[:, -1].values
 print("X values",X)
 print("y values",y)
 
-X = X.reshape(-1,6)
+
+X = X.reshape(-1,11)
 y = y.reshape(-1,1)
+
 
 print(X.shape)
 print(y.shape)
@@ -45,22 +47,30 @@ def r2score(y_pred, y):
     r2 = 1 - (rss / tss)
     return r2
 
+def calculate_smape(y_test, y_pred):
+    A = np.array(y_test)
+    F = np.array(y_pred)
+    return 100/len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))
+
 # Step 5 - Predict Results
 
 # First transform 6.5 to feature scaling
-sc_X_val = sc_X.transform(np.array([[6.5,6.5,6.5,6.5,6.5,6.5]]))
+sc_X_val = sc_X.transform(np.array([[6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5,6.5]]))
 # Second predict the value
 scaled_y_pred = regressor.predict(X_test)
 scaled_y_pred = scaled_y_pred.reshape(-1,1)
 # Third - since this is scaled - we have to inverse transform
 y_pred = sc_y.inverse_transform(scaled_y_pred)
-print('The predicted revenue value of movies ',y_pred)
 
-print(type(y_test),type(y_pred))
+print('The predicted revenue value of movies ',y_pred)
+#print(type(y_test),type(y_pred))
 
 print(y_pred.size)
 r2 = r2score(y_pred, y_test)
 print(f'r^2: {r2}')
+
+smape = calculate_smape(y_test, y_pred)
+print(f'SMAPE (%): {smape}')
 
 
 
