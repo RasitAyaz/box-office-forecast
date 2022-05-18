@@ -94,7 +94,7 @@ headers = [
     'revenue',
 ]
 
-data = pd.DataFrame(columns=headers)
+data_items = []
 
 for year in range(1990, 2020):
     movies: dict
@@ -133,7 +133,7 @@ for year in range(1990, 2020):
             companies, companies_json, date)
 
         if len(companies) > 0 and len(genres) > 0:
-            data = data.append({
+            data_items.append({
                 'budget': movie['budget'],
                 'director_max': director_max,
                 'star_avg': star_avg,
@@ -146,7 +146,7 @@ for year in range(1990, 2020):
                 'year': get_year(date),
                 'month': get_month(date),
                 'revenue': movie['revenue'],
-            }, ignore_index=True)
+            })
 
 
 def remove_all_outliers(data):
@@ -169,6 +169,8 @@ def standardize(data):
     data = scaler.fit_transform(data)
     return pd.DataFrame(data, columns=headers)
 
+data: pd.DataFrame
+data = pd.DataFrame(data_items, columns=headers)
 
 # Fill empty features with average value
 data = data.fillna(data.mean())
