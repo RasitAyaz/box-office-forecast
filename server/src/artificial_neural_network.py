@@ -1,8 +1,11 @@
+import csv
+import os
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import StandardScaler
+
+current_path = os.path.dirname(__file__)
 
 
 def relu(z):
@@ -64,7 +67,7 @@ def update_params(params, grads, learning_rate):
         params_updated['B' + str(i)] = params['B' + str(i)] - learning_rate * grads['B' + str(i)]
     return params_updated
 
-def model(X_train, Y_train, layer_sizes, num_iters, learning_rate):
+def build_model(X_train, Y_train, layer_sizes, num_iters, learning_rate):
     params = initialize_params(layer_sizes)
     for i in range(num_iters):
         values = forward_propagation(X_train.T, params)
@@ -79,18 +82,45 @@ def compute_accuracy(X_train, X_test, Y_train, Y_test, params):
     
     values_test = forward_propagation(X_test.T, params)
     test_acc = np.sqrt(mean_squared_error(Y_test, values_test['A' + str(len(layer_sizes)-1)].T))
+    
+    r2 = r2score(Y_test, values_test['A' + str(len(layer_sizes)-1)].T)
+    print(f'r^2: {r2}')
+    smape = calculate_smape(Y_test,values_test['A' + str(len(layer_sizes)-1)].T)
+    print(f'SMAPE (%): {smape}')
+
     return train_acc, test_acc
+
+def calculate_smape(y_test, y_pred):
+    A = np.array(y_test)
+    F = np.array(y_pred)
+    return 100/len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))
+
+def r2score(y, y_pred):
+    rss = np.sum((y_pred - y) ** 2)
+    tss = np.sum((y-y.mean()) ** 2)
+
+    r2 = 1 - (rss / tss)
+    return r2
 
 def predict(X, params):
     values = forward_propagation(X.T, params)
     predictions = values['A' + str(len(values)//2)].T
     return predictions
 
+def store_model(model):
+    
+    params = ['W1','B1','W2','B2','W3','B3']
+
+    with open(f'{current_path}/../models/artificial_neural_network.csv', 'w', newline='') as model_file:
+        writer = csv.DictWriter(model_file, fieldnames = params)
+        writer.writeheader()
+        writer.writerows(model) 
+
 
 dataset_path = 'server/dataset.csv'
 data = pd.read_csv(dataset_path)
 
-layer_sizes = [11, 4, 4, 1]
+layer_sizes = [11, 8, 8, 1]
 num_iters = 1000
 learning_rate = 0.03
 
@@ -99,9 +129,6 @@ Y = data.iloc[:, -1].values
 
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.20)
 
-params = model(X_train, Y_train, layer_sizes, num_iters,learning_rate)  # train the model
-
-train_acc, test_acc = compute_accuracy(X_train, X_test, Y_train, Y_test, params)  # get training and test accuracy
-
-#print(params)
-
+model = build_model(X_train, Y_train, layer_sizes, num_iters,learning_rate)  # train the model
+# store_model(model)
+train_acc, test_acc = compute_accuracy(X_train, X_test, Y_train, Y_test, model)  # get training and test accuracy
