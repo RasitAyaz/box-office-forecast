@@ -39,19 +39,21 @@ def calculate_growing_impact(list, json, date):
         value_sum = 0
         factor_sum = 0
         for credit in json_item['credits']:
-            if credit['date'] > date:
+            if credit['date'] >= date:
                 break
             year_diff = get_year(date) - get_year(credit['date'])
             factor = 1 / (year_diff + 1)
             value_sum += credit['value'] * factor
             factor_sum += factor
 
+        if factor_sum == 0:
+            continue
+
         impact = value_sum / factor_sum
         impact_sum += impact
         impact_max = max(impact_max, impact)
 
     impact_avg = impact_sum / len(list)
-
     return impact_avg, impact_max
 
 
@@ -70,9 +72,7 @@ def calculate_genre_impact(genres):
 
 headers = [
     'budget',
-    'director_avg',
     'director_max',
-    'director_count',
     'star_avg',
     'star_max',
     'company_avg',
@@ -80,6 +80,7 @@ headers = [
     'company_count',
     # 'genre_impact',
     'producer_count',
+    'runtime',
     'revenue',
 ]
 
@@ -111,6 +112,9 @@ with open(dataset_path, 'w', newline='') as dataset:
                 if person['department'] == 'Production':
                     producer_count += 1
 
+            if producer_count == 0:
+                continue
+
             director_avg, director_max = calculate_growing_impact(
                 directors, directors_json, date)
             star_avg, star_max = calculate_growing_impact(
@@ -118,12 +122,13 @@ with open(dataset_path, 'w', newline='') as dataset:
             company_avg, company_max = calculate_growing_impact(
                 companies, companies_json, date)
 
+            if director_max == 0 or star_max == 0 or company_max == 0:
+                continue
+
             if len(companies) > 0 and len(genres) > 0:
                 writer.writerow([
                     movie['budget'],
-                    director_avg,
                     director_max,
-                    len(directors),
                     star_avg,
                     star_max,
                     company_avg,
@@ -131,8 +136,13 @@ with open(dataset_path, 'w', newline='') as dataset:
                     len(companies),
                     # calculate_genre_impact(genres),
                     producer_count,
+                    movie['runtime'],
                     movie['revenue'],
                 ])
+
+
+def remove_all_outliers(data):
+    return data[(np.abs(stats.zscore(data)) < 3).all(axis=1)]
 
 
 def remove_outliers(data):
@@ -149,7 +159,7 @@ def remove_outliers(data):
 data = pd.read_csv(dataset_path)
 print(f'Data size: {len(data)}')
 # Removes all outliers
-data = remove_outliers(data)
+# data = remove_all_outliers(data)
 print(f'Data size after outlier removal: {len(data)}')
-data = pd.DataFrame(preprocessing.scale(data), columns=headers)
+# data = pd.DataFrame(preprocessing.scale(data.astype(float)), columns=headers)
 data.to_csv(dataset_path, index=False)
