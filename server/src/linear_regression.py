@@ -78,7 +78,7 @@ def build_model(X, y):
         X, y, test_size=0.25, random_state=100
     )
 
-    epochs = 10000
+    epochs = 1000
     print(f'number of epochs: {epochs}')
 
     weights, bias, costs = gradient_descent_function(
