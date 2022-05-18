@@ -1,9 +1,8 @@
-import warnings
 import numpy as np
 import pandas as pd
-from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 
 def relu(z):
@@ -76,8 +75,9 @@ def model(X_train, Y_train, layer_sizes, num_iters, learning_rate):
 
 def compute_accuracy(X_train, X_test, Y_train, Y_test, params):
     values_train = forward_propagation(X_train.T, params)
-    values_test = forward_propagation(X_test.T, params)
     train_acc = np.sqrt(mean_squared_error(Y_train, values_train['A' + str(len(layer_sizes)-1)].T))
+    
+    values_test = forward_propagation(X_test.T, params)
     test_acc = np.sqrt(mean_squared_error(Y_test, values_test['A' + str(len(layer_sizes)-1)].T))
     return train_acc, test_acc
 
@@ -89,20 +89,19 @@ def predict(X, params):
 
 dataset_path = 'server/dataset.csv'
 data = pd.read_csv(dataset_path)
-X = data.iloc[:, 0:-1].values
-Y = data.iloc[:, -1].values
 
-# data = load_boston()
-# X,Y = data['data'],data['target']
-
-layer_sizes = [5, 4, 4, 1]
+layer_sizes = [11, 4, 4, 1]
 num_iters = 1000
 learning_rate = 0.03
+
+X = data.iloc[:, 0:-1].values
+Y = data.iloc[:, -1].values
 
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.20)
 
 params = model(X_train, Y_train, layer_sizes, num_iters,learning_rate)  # train the model
 
 train_acc, test_acc = compute_accuracy(X_train, X_test, Y_train, Y_test, params)  # get training and test accuracy
-print('Root Mean Squared Error on Training Data = ' + str(train_acc))
-print('Root Mean Squared Error on Test Data = ' + str(test_acc))
+
+#print(params)
+
