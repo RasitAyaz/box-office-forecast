@@ -1,10 +1,13 @@
 # Imports
-
+import os
 import numpy as np
 from matplotlib import pyplot as plt
-from os.path import isfile
+from genericpath import isfile
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from importlib_metadata import csv
+
+current_path = os.path.dirname(__file__)
 
 import tensorflow.compat.v1 as tf
 
@@ -79,8 +82,19 @@ class SVR(object):
         )
         return y_pred
     
-    
-dataset_path = 'server/data/dataset.csv'
+def r2score(y_pred, y):
+    rss = np.sum((y_pred - y) ** 2)
+    tss = np.sum((y-y.mean()) ** 2)
+
+    r2 = 1 - (rss / tss)
+    return r2
+
+def calculate_smape(y_test, y_pred):
+    A = np.array(y_test)
+    F = np.array(y_pred)
+    return 100/len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))
+       
+dataset_path = f'{current_path}/../dataset.csv'
 
 if isfile(dataset_path):
     data = pd.read_csv(dataset_path)
@@ -98,8 +112,14 @@ if isfile(dataset_path):
     model = SVR(epsilon=0.2)
     model.fit(X_train, y_train)
     
-    print(model.predict(X_test))
+    y_pred = model.predict(X_test)
     
+    r2 = r2score(y_pred, y_test)
+    print(f'r^2: {r2}')
+
+    smape = calculate_smape(y_test, y_pred)
+    print(f'SMAPE (%): {smape}')
+
 
 else:
     print('Dataset not found ')
