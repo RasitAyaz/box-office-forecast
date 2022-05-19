@@ -19,8 +19,9 @@ df = data.copy()
 X = df.drop("revenue", axis=1)
 y = df["revenue"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+print('---------------------------')
 
+X_train, X_test, y_train, y_test = train_test_split(X, y)
 lr = LinearRegression().fit(X_test, y_test)
 
 score = lr.score(X_train, y_train)
@@ -46,13 +47,18 @@ print(f'ANN test score: {score}')
 score = ann.score(X, y)
 print(f'ANN overall score: {score}')
 
+print('---------------------------')
 
+X_train, X_test, y_train, y_test = train_test_split(X, y)
 svr = make_pipeline(SVR(C=1.0, epsilon=0.2)).fit(X_train, y_train)
 
 score = svr.score(X_train, y_train)
-print(f'SVR score: {score}')
+print(f'SVR train score: {score}')
 
 score = svr.score(X_test, y_test)
-print(f'SVR score: {score}')
+print(f'SVR test score: {score}')
+
+score = svr.score(X, y)
+print(f'SVR overall score: {score}')
 
     
