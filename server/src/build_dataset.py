@@ -117,7 +117,7 @@ headers = [
 
 data_items = []
 
-for year in range(1990, 2020):
+for year in range(2000, 2020):
     movies: dict
     movies = read_json_file(f'{current_path}/../data/years/{year}.json')
     for id, movie in movies.items():
@@ -206,7 +206,7 @@ print(f'Data size: {len(data)}')
 # print(f'Data size after outlier removal: {len(data)}')
 
 # Standardization
-# data = standardize(data)
+data = standardize(data)
 
 dataset_path = f'{current_path}/../dataset.csv'
 data.to_csv(dataset_path, index=False)

@@ -110,7 +110,7 @@ def store(title, values):
         outfile.write(json.dumps(values, indent=4))
 
 
-for year in range(1990, 2020):
+for year in range(2000, 2020):
     path = f'{current_path}/../data/years/{year}.json'
     if isfile(path):
         movies_of_year = json.load(open(path))
