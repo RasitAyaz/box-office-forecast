@@ -10,6 +10,7 @@ from scipy import stats
 from sklearn import preprocessing
 
 current_path = os.path.dirname(__file__)
+data_path = f'{current_path}/../data'
 
 
 def read_json_file(path):
@@ -20,10 +21,14 @@ def read_json_file(path):
         exit()
 
 
-directors_json = read_json_file(f'{current_path}/../data/directors.json')
-stars_json = read_json_file(f'{current_path}/../data/stars.json')
-companies_json = read_json_file(f'{current_path}/../data/companies.json')
-genres_json = read_json_file(f'{current_path}/../data/genres.json')
+directors_json = read_json_file(f'{data_path}/directors.json')
+stars_json = read_json_file(f'{data_path}/stars.json')
+companies_json = read_json_file(f'{data_path}/companies.json')
+genres_json = read_json_file(f'{data_path}/genres.json')
+months_json = read_json_file(f'{data_path}/months.json')
+keywords_json = read_json_file(f'{data_path}/keywords.json')
+languages_json = read_json_file(f'{data_path}/languages.json')
+countries_json = read_json_file(f'{data_path}/countries.json')
 
 
 def get_year(date):
@@ -34,35 +39,45 @@ def get_month(date):
     return int(date[5:7])
 
 
-def calculate_growing_impact(list, json, date):
+def calculate_impact(id, json, date):
+    json_item = json[str(id)]
+    value_sum = 0
+    factor_sum = 0
+    for credit in json_item['credits']:
+        if credit['date'] >= date:
+            break
+        year_diff = get_year(date) - get_year(credit['date'])
+        factor = 1 / (year_diff + 1)
+        value_sum += credit['value'] * factor
+        factor_sum += factor
+
+    if factor_sum == 0:
+        return 0
+    else:
+        return value_sum / factor_sum
+
+
+def calculate_list_impact(list, json, date):
     impact_max = 0
     impact_sum = 0
 
     for item in list:
-        json_item = json[str(item['id'])]
-        value_sum = 0
-        factor_sum = 0
-        for credit in json_item['credits']:
-            if credit['date'] >= date:
-                break
-            year_diff = get_year(date) - get_year(credit['date'])
-            factor = 1 / (year_diff + 1)
-            value_sum += credit['value'] * factor
-            factor_sum += factor
+        if 'iso_3166_1' in item:
+            id = item['iso_3166_1']
+        elif 'iso_639_1' in item:
+            id = item['iso_639_1']
+        else:
+            id = item['id']
 
-        if factor_sum == 0:
-            continue
-
-        impact = value_sum / factor_sum
+        impact = calculate_impact(id, json, date)
         impact_sum += impact
         impact_max = max(impact_max, impact)
 
-    
-    impact_avg = impact_sum / len(list)
 
-    if impact_avg == 0 or impact_max == 0:
+    if len(list) == 0 or impact_max == 0:
         return pd.NA, pd.NA
     else:
+        impact_avg = impact_sum / len(list)
         return impact_avg, impact_max
 
 
@@ -89,8 +104,14 @@ headers = [
     'company_count',
     'producer_count',
     'runtime',
-    'year',
     'month',
+    'month_impact',
+    'keyword_avg',
+    'keyword_max',
+    'language_avg',
+    'language_max',
+    'country_avg',
+    'country_max',
     'revenue',
 ]
 
@@ -121,12 +142,13 @@ for year in range(1990, 2020):
         if producer_count == 0:
             continue
 
-        director_avg, director_max = calculate_growing_impact(
-            directors, directors_json, date)
-        star_avg, star_max = calculate_growing_impact(
-            stars, stars_json, date)
-        company_avg, company_max = calculate_growing_impact(
-            companies, companies_json, date)
+        director_avg, director_max = calculate_list_impact(directors, directors_json, date)
+        star_avg, star_max = calculate_list_impact(stars, stars_json, date)
+        company_avg, company_max = calculate_list_impact(companies, companies_json, date)
+        keyword_avg, keyword_max = calculate_list_impact(movie['keywords'], keywords_json, date)
+        language_avg, language_max = calculate_list_impact(movie['spoken_languages'], languages_json, date)
+        country_avg, country_max = calculate_list_impact(movie['production_countries'], countries_json, date)
+
 
         if len(companies) > 0 and len(genres) > 0:
             data_items.append({
@@ -139,8 +161,14 @@ for year in range(1990, 2020):
                 'company_count': len(companies),
                 'producer_count': producer_count,
                 'runtime': movie['runtime'],
-                'year': get_year(date),
                 'month': get_month(date),
+                'month_impact': calculate_impact(get_month(date), months_json, date),
+                'keyword_avg': keyword_avg,
+                'keyword_max': keyword_max,
+                'language_avg': language_avg,
+                'language_max': language_max,
+                'country_avg': country_avg,
+                'country_max': country_max,
                 'revenue': movie['revenue'],
             })
 
@@ -178,7 +206,7 @@ print(f'Data size: {len(data)}')
 # print(f'Data size after outlier removal: {len(data)}')
 
 # Standardization
-data = standardize(data)
+# data = standardize(data)
 
 dataset_path = f'{current_path}/../dataset.csv'
 data.to_csv(dataset_path, index=False)

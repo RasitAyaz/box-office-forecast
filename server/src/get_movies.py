@@ -1,7 +1,8 @@
-from genericpath import isfile
-import os
-import requests
 import json
+import os
+
+import requests
+from genericpath import isfile
 
 current_path = os.path.dirname(__file__)
 
@@ -20,26 +21,32 @@ def get_movie_details_in_page(page_json, movies: dict):
     for movie in page_json['results']:
         if str(movie['id']) in movies:
             continue
-        url = f'{api_url}/movie/{movie["id"]}?api_key={api_key}&append_to_response=credits'
+        url = f'{api_url}/movie/{movie["id"]}?api_key={api_key}&append_to_response=credits,release_dates,keywords'
         response = requests.get(url)
         if response.ok:
             movie = json.loads(response.text)
             if movie['vote_count'] < 10:
                 return False
-            if movie['budget'] > 0 and movie['revenue'] > 0 and movie['belongs_to_collection'] == None:
+            if movie['budget'] >= 10000 and movie['revenue'] >= 10000 and movie['belongs_to_collection'] == None:
                 print(f'Fetched "{movie["title"]}".')
                 new_movie = {
                     'imdb_id': movie['imdb_id'],
                     'title': movie['title'],
+                    'original_language': movie['original_language'],
                     'overview': movie['overview'],
                     'budget': movie['budget'],
                     'revenue': movie['revenue'],
-                    'popularity': movie['popularity'],
                     'release_date': movie['release_date'],
                     'runtime': movie['runtime'],
+                    'popularity': movie['popularity'],
+                    'vote_average': movie['vote_average'],
+                    'vote_count': movie['vote_count'],
                     'genres': movie['genres'],
                     'production_companies': movie['production_companies'],
                     'production_countries': movie['production_countries'],
+                    'spoken_languages': movie['spoken_languages'],
+                    'keywords': movie['keywords']['keywords'],
+                    'release_dates': movie['release_dates']['results'],
                     'cast': [],
                     'crew': [],
                 }

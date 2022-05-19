@@ -13,6 +13,10 @@ directors_out = {}
 stars_out = {}
 companies_out = {}
 genres_out = {}
+months_out = {}
+keywords_out = {}
+languages_out = {}
+countries_out = {}
 
 
 def add_credit(credits: list, new_credit):
@@ -24,9 +28,27 @@ def add_credit(credits: list, new_credit):
 
 
 def update_impact(item, items, new_credit):
-    id = item['id']
+    if 'iso_3166_1' in item:
+        id = item['iso_3166_1']
+    elif 'iso_639_1' in item:
+        id = item['iso_639_1']
+    else:
+        id = item['id']
+
+    if 'english_name' in item:
+        name = item['english_name']
+    else:
+        name = item['name']
+
     if id not in items:
-        items[id] = {'name': item['name'], 'credits': [new_credit]}
+        items[id] = {'name': name, 'credits': [new_credit]}
+    else:
+        add_credit(items[id]['credits'], new_credit)
+
+
+def update_impact_with_id(id, items, new_credit):
+    if id not in items:
+        items[id] = {'credits': [new_credit]}
     else:
         add_credit(items[id]['credits'], new_credit)
 
@@ -39,6 +61,10 @@ def add_genre_value(genre, new_value):
         if 'values' not in genres_out[id]:
             print(genre)
         genres_out[id]['values'].append(new_value)
+
+
+def get_month(date):
+    return int(date[5:7])
 
 
 def extract(movies: dict):
@@ -58,6 +84,17 @@ def extract(movies: dict):
 
         for genre in movie['genres'][:n_genres]:
             add_genre_value(genre, movie['revenue'])
+
+        for keyword in movie['keywords']:
+            update_impact(keyword, keywords_out, new_credit)
+
+        for country in movie['production_countries']:
+            update_impact(country, countries_out, new_credit)
+
+        for language in movie['spoken_languages']:
+            update_impact(language, languages_out, new_credit)
+
+        update_impact_with_id(get_month(date), months_out, new_credit)
 
 
 def calculate_genre_values():
@@ -88,3 +125,7 @@ store('directors', directors_out)
 store('stars', stars_out)
 store('companies', companies_out)
 store('genres', genres_out)
+store('months', months_out)
+store('keywords', keywords_out)
+store('countries', countries_out)
+store('languages', languages_out)
