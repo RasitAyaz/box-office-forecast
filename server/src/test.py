@@ -1,11 +1,9 @@
-from audioop import cross
 from genericpath import isfile
 import os
-import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
 
 
 current_path = os.path.dirname(__file__)
@@ -19,26 +17,24 @@ df = data.copy()
 X = df.drop("revenue", axis=1)
 y = df["revenue"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state= 100)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state= 100)
 
-lm = LinearRegression()
-model = lm.fit(X_train, y_train)
+lr = LinearRegression().fit(X_test, y_test)
 
+score = lr.score(X_train, y_train)
+print(f'LR train score: {score}')
 
-rmse = np.sqrt(mean_squared_error(y_train, model.predict(X_train)))
-print(f'rmse(train): {rmse}')
+score = lr.score(X_test, y_test)
+print(f'LR test score: {score}')
 
-rmse = np.sqrt(mean_squared_error(y_test, model.predict(X_test)))
-print(f'rmse(test): {rmse}')
+ann = MLPRegressor(max_iter=1000).fit(X_train, y_train)
 
-score = model.score(X_train,y_train)
-print(f'score: {score}')
+score = ann.score(X_train, y_train)
+print(f'ANN score: {score}')
 
-cross_val_score = cross_val_score(model,X,y,cv=10,scoring ="r2").mean()
-print(f'cross val mean score: {cross_val_score}')
+score = ann.score(X_test, y_test)
+print(f'ANN score: {score}')
 
-mape = mean_absolute_percentage_error(y_test, model.predict(X_test))
-print(f'mape: {mape}')
 
 
     
