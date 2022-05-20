@@ -51,16 +51,6 @@ def prepare_feature(feature, counts, min_count, print_list: bool):
             print(f'{genre["name"]}: {genre["count"]}')
 
 
-def add_feature_columns(row, movie_items, counts: dict):
-    for id, item in counts.items():
-        row[f'{id}'] = 0
-
-    for item in movie_items:
-        id = item['id']
-        if id in counts:
-            row[f'{id}'] = 1
-
-
 genre_counts = {}
 company_counts = {}
 star_counts = {}
@@ -99,12 +89,24 @@ def display_impacts(feature, sorted_importances):
     plt.show()
 
 
-def calculate_impacts(feature, movie_feature, counts):
+def get_name(item):
+    return item['name']
+
+
+def calculate_impacts(movie_feature, counts: dict, min_importance):
     data_items = []
 
     for movie in all_movies:
         row = {}
-        add_feature_columns(row, movie[movie_feature], counts)
+
+        for id, item in counts.items():
+            row[f'{id}'] = 0
+
+        for item in movie[movie_feature]:
+            id = item['id']
+            if id in counts:
+                row[f'{id}'] = 1
+        
         row['revenue'] = movie['revenue']
         data_items.append(row)
 
@@ -121,36 +123,55 @@ def calculate_impacts(feature, movie_feature, counts):
 
     count = 0
     for feature_importance in regressor.feature_importances_:
-        if feature_importance > 0.002:
+        if feature_importance > min_importance:
             feature_id = X_headers[count]
             importances[feature_id] = feature_importance
         count += 1
 
-    importances = {k: v for k, v in sorted(importances.items(), key=lambda item: item[1], reverse=True)}
+    # importances = {k: v for k, v in sorted(importances.items(), key=lambda item: item[1], reverse=True)}
+
+    importance_data_items = []
+    
+    for id, item in counts.items():
+        id = str(id)
+        if id not in importances:
+            continue
+        
+        importance_data_items.append({
+            'id': id,
+            'name': get_name(item),
+            'importance': importances[id]
+        })
+
+    importance_data_items = sorted(importance_data_items, key=lambda item: item['importance'], reverse=True)
+
+    importance_data: pd.DataFrame
+    importance_data = pd.DataFrame(importance_data_items)
+
     # Get top 40 features
     # sorted_importances = sorted_importances[0:40]
 
     # display_impacts(feature, sorted_importances)
 
-    return importances
+    return importance_data
 
-def store_impacts_to_csv(feature, importances):
-    data = pd.DataFrame(importances.items(), columns=['id', 'importance'])
+def store_impacts_to_csv(feature, importance_data):
+    data = pd.DataFrame(importance_data)
     path = f'{current_path}/../data/impacts/{feature}.csv'
     data.to_csv(path, index=False)
 
 
-prepare_feature('genres', genre_counts, min_count=15, print_list=False)
+prepare_feature('genres', genre_counts, min_count=2, print_list=False)
 prepare_feature('companies', company_counts, min_count=15, print_list=False)
-prepare_feature('stars', star_counts, min_count=15, print_list=False)
+prepare_feature('stars', star_counts, min_count=5, print_list=False)
 
 
-importances = calculate_impacts('genres', 'genres', genre_counts)
-store_impacts_to_csv('genres', importances)
+importance_data = calculate_impacts('genres', genre_counts, min_importance=0.001)
+store_impacts_to_csv('genres', importance_data)
 
-importances = calculate_impacts('companies', 'production_companies', company_counts)
-store_impacts_to_csv('companies', importances)
+importance_data = calculate_impacts('production_companies', company_counts, min_importance=0.001)
+store_impacts_to_csv('companies', importance_data)
 
-importances = calculate_impacts('stars', 'cast', star_counts)
-store_impacts_to_csv('stars', importances)
+importance_data = calculate_impacts('cast', star_counts, min_importance=0.001)
+store_impacts_to_csv('stars', importance_data)
 
