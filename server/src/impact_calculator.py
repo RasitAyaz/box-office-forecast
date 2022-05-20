@@ -235,7 +235,6 @@ company_counts = {}
 country_counts = {}
 language_counts = {}
 cast_counts = {}
-crew_counts = {}
 keyword_counts = {}
 
 directing_counts = {}
