@@ -97,7 +97,7 @@ costume_impacts = read_impact_csv('costume')
 data_items = []
 
 for year in range(1990, 2020):
-    print(f'Processing year {year}')
+    print(f'Processing year {year}...', end='\r')
     movies: dict
     movies = read_json_file(f'{current_path}/../data/years/{year}.json')
     for id, movie in movies.items():
@@ -206,6 +206,7 @@ data = pd.DataFrame(data_items)
 # Fill empty features with average value
 data = data.fillna(data.mean())
 
+print(end='\x1b[2K')
 print(f'Data size: {len(data)}')
 
 # Removes all outliers
