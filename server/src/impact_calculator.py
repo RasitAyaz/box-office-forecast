@@ -43,12 +43,12 @@ def prepare_feature(feature, counts, min_count, print_list: bool):
     total = len(counts)
     set_min_count(counts, min_count)
     counts = sort_counts(counts)
-    print('--------------------------------')
-    print(f'Total {feature}: {len(counts)} / {total} (>= {min_count})')
+    print(f'Total {feature}: {len(counts)} / {total} (count >= {min_count})')
+    print('----------------------------------------------------')
     if print_list:
-        print('--------------------------------')
         for id, genre in counts.items():
             print(f'{genre["name"]}: {genre["count"]}')
+        print('----------------------------------------------------')
 
 
 genre_counts = {}
@@ -73,9 +73,6 @@ for year in range(1990, 2020):
     else:
         print(f'{path} could not be found.')
         exit()
-
-print('--------------------------------')
-print(f'Total movies: {len(all_movies)}')
 
 
 def display_impacts(feature, sorted_importances):
@@ -152,6 +149,9 @@ def calculate_impacts(movie_feature, counts: dict, min_importance):
     # sorted_importances = sorted_importances[0:40]
 
     # display_impacts(feature, sorted_importances)
+    
+    print(f'Total {movie_feature}: {len(importance_data)} / {len(counts)} (importance >= {min_importance})')
+    print('----------------------------------------------------')
 
     return importance_data
 
@@ -161,10 +161,15 @@ def store_impacts_to_csv(feature, importance_data):
     data.to_csv(path, index=False)
 
 
+print('\n\nCOUNT FILTERS')
+print('----------------------------------------------------')
+
 prepare_feature('genres', genre_counts, min_count=2, print_list=False)
 prepare_feature('companies', company_counts, min_count=15, print_list=False)
 prepare_feature('stars', star_counts, min_count=5, print_list=False)
 
+print('\n\nIMPORTANCE FILTERS')
+print('----------------------------------------------------')
 
 importance_data = calculate_impacts('genres', genre_counts, min_importance=0.001)
 store_impacts_to_csv('genres', importance_data)
@@ -175,3 +180,5 @@ store_impacts_to_csv('companies', importance_data)
 importance_data = calculate_impacts('cast', star_counts, min_importance=0.001)
 store_impacts_to_csv('stars', importance_data)
 
+
+print(f'\nTotal movies: {len(all_movies)}')
