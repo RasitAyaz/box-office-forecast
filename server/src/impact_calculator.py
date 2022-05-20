@@ -55,6 +55,51 @@ def count_crew_members(crew):
             counts[id]['count'] += 1
 
 
+def get_month_name(month):
+    if month == 1:
+        return 'January'
+    elif month == 2:
+        return 'February'
+    elif month == 3:
+        return 'March'
+    elif month == 4:
+        return 'April'
+    elif month == 5:
+        return 'May'
+    elif month == 6:
+        return 'June'
+    elif month == 7:
+        return 'July'
+    elif month == 8:
+        return 'August'
+    elif month == 9:
+        return 'September'
+    elif month == 10:
+        return 'October'
+    elif month == 11:
+        return 'November'
+    elif month == 12:
+        return 'December'
+
+
+def get_month(date):
+    return int(date[5:7])
+
+
+def count_month(month):
+    if month not in month_counts:
+        month_counts[month] = {'name': get_month_name(month), 'count': 1}
+    else:
+        month_counts[month]['count'] += 1
+
+
+def count_original_language(language):
+    if language not in original_language_counts:
+        original_language_counts[language] = {'name': language, 'count': 1}
+    else:
+        original_language_counts[language]['count'] += 1
+
+
 def count_features(counts, feature_items):
     for item in feature_items:
         id = get_id(item)
@@ -103,19 +148,33 @@ def store_impacts_to_csv(feature, importance_data):
     data.to_csv(path, index=False)
 
 
-def filter_by_impact_and_store(feature, movie_feature, counts: dict, min_importance):
+def filter_by_impact_and_store(feature, list_feature, counts: dict, min_importance):
     data_items = []
 
     for movie in all_movies:
         row = {}
 
-        for id, item in counts.items():
-            row[id] = 0
+        if feature == 'months':
+            for month_number, month in month_counts.items():
+                row[month_number] = 0
+            
+            row[get_month(movie['release_date'])] = 1
 
-        for item in movie[movie_feature]:
-            id = get_id(item)
-            if id in counts:
-                row[id] = 1
+        elif feature == 'original_languages':
+            for code, language in original_language_counts.items():
+                row[code] = 0
+            
+            if movie['original_language'] in original_language_counts:
+                row[movie['original_language']] = 1
+
+        else:
+            for id, item in counts.items():
+                row[id] = 0
+
+            for item in movie[list_feature]:
+                id = get_id(item)
+                if id in counts:
+                    row[id] = 1
         
         row['revenue'] = movie['revenue']
         data_items.append(row)
@@ -143,7 +202,6 @@ def filter_by_impact_and_store(feature, movie_feature, counts: dict, min_importa
     importance_data_items = []
     
     for id, item in counts.items():
-        id = str(id)
         if id not in importances:
             continue
         
@@ -168,6 +226,9 @@ def filter_by_impact_and_store(feature, movie_feature, counts: dict, min_importa
 
     store_impacts_to_csv(feature, importance_data)
 
+
+month_counts = {}
+original_language_counts = {}
 
 genre_counts = {}
 company_counts = {}
@@ -205,6 +266,8 @@ for year in range(1990, 2020):
             count_features(cast_counts, movie['cast'])
             count_features(keyword_counts, movie['keywords'])
             count_crew_members(movie['crew'])
+            count_month(get_month(movie['release_date']))
+            count_original_language(movie['original_language'])
     else:
         print(f'{path} could not be found.')
         exit()
@@ -212,6 +275,9 @@ for year in range(1990, 2020):
 
 print('\n\nCOUNT FILTERS')
 print('----------------------------------------------------')
+
+filter_by_count('months', month_counts, min_count=0)
+filter_by_count('original_languages', original_language_counts, min_count=0)
 
 filter_by_count('genres', genre_counts, min_count=2)
 filter_by_count('companies', company_counts, min_count=15)
@@ -231,6 +297,9 @@ filter_by_count('costume', costume_counts, min_count=5)
 
 print('\n\nIMPORTANCE FILTERS')
 print('----------------------------------------------------')
+
+filter_by_impact_and_store('months', None, month_counts, min_importance=0.001)
+filter_by_impact_and_store('original_languages', None, original_language_counts, min_importance=0.001)
 
 filter_by_impact_and_store('genres', 'genres', genre_counts, min_importance=0.001)
 filter_by_impact_and_store('companies', 'production_companies', company_counts, min_importance=0.001)
