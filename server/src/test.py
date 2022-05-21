@@ -50,15 +50,27 @@ print(f'ANN overall score: {score}')
 print('---------------------------')
 
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-svr = make_pipeline(SVR(C=1.0, epsilon=0.2)).fit(X_train, y_train)
+svr = make_pipeline(SVR(kernel = "linear", C=1.0, epsilon=0.2)).fit(X_train, y_train)
+svr2 = make_pipeline(SVR(kernel = "rbf", C=1.0, epsilon=0.2)).fit(X_train, y_train)
 
 score = svr.score(X_train, y_train)
-print(f'SVR train score: {score}')
+print(f'SVR with linear kernel train score: {score}')
 
 score = svr.score(X_test, y_test)
-print(f'SVR test score: {score}')
+print(f'SVR with linear kernel test score: {score}')
 
 score = svr.score(X, y)
-print(f'SVR overall score: {score}')
+print(f'SVR with linear kernel overall score: {score}')
+
+print('---------------------------')
+
+score = svr2.score(X_train, y_train)
+print(f'SVR with rbf kernel train score: {score}')
+
+score = svr2.score(X_test, y_test)
+print(f'SVR with rbf kernel test score: {score}')
+
+score = svr2.score(X, y)
+print(f'SVR with rbf kernel overall score: {score}')
 
     
