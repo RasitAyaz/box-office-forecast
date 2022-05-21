@@ -51,7 +51,7 @@ def get_month(date):
 def get_impact(id, impact_data: pd.DataFrame):
     search_data = impact_data.loc[impact_data['id'] == id]
     if len(search_data) == 0:
-        return None
+        return 0
     else:
         return search_data.iloc[0]['importance']
 
@@ -113,7 +113,7 @@ for year in range(1990, 2020):
         sound = [p for p in crew if p['department'] == 'Sound']
         costume = [p for p in crew if p['department'] == 'Costume & Make-Up']
 
-        cast = movie['cast'][:5]
+        cast = movie['cast']
         companies = movie['production_companies']
 
         genres = movie['genres']
@@ -147,33 +147,33 @@ for year in range(1990, 2020):
                 'runtime': movie['runtime'],
                 'month_impact': month_impact,
                 'original_language_impact': original_language_impact,
-                'genre_avg': genre_avg,
+                # 'genre_avg': genre_avg,
                 'genre_max': genre_max,
-                'company_avg': company_avg,
+                # 'company_avg': company_avg,
                 'company_max': company_max,
-                'country_avg': country_avg,
+                # 'country_avg': country_avg,
                 'country_max': country_max,
-                'language_avg': language_avg,
+                # 'language_avg': language_avg,
                 'language_max': language_max,
-                'cast_avg': cast_avg,
+                # # 'cast_avg': cast_avg,
                 'cast_max': cast_max,
-                'keyword_avg': keyword_avg,
+                # 'keyword_avg': keyword_avg,
                 'keyword_max': keyword_max,
-                'director_avg': director_avg,
+                # 'director_avg': director_avg,
                 'director_max': director_max,
-                'writer_avg': writer_avg,
+                # 'writer_avg': writer_avg,
                 'writer_max': writer_max,
-                'producer_avg': producer_avg,
+                # 'producer_avg': producer_avg,
                 'producer_max': producer_max,
-                'editor_avg': editor_avg,
+                # 'editor_avg': editor_avg,
                 'editor_max': editor_max,
-                'camera_avg': camera_avg,
+                # 'camera_avg': camera_avg,
                 'camera_max': camera_max,
-                'art_avg': art_avg,
+                # 'art_avg': art_avg,
                 'art_max': art_max,
-                'sound_avg': sound_avg,
+                # 'sound_avg': sound_avg,
                 'sound_max': sound_max,
-                'costume_avg': costume_avg,
+                # 'costume_avg': costume_avg,
                 'costume_max': costume_max,
                 'revenue': movie['revenue'],
             })
@@ -218,3 +218,4 @@ data = standardize(data)
 
 dataset_path = f'{current_path}/../dataset.csv'
 data.to_csv(dataset_path, index=False)
+

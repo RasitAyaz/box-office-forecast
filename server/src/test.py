@@ -16,12 +16,13 @@ if isfile(dataset_path):
     print(f'Data size: {len(data)}')
     
 df = data.copy()
+
 X = df.drop("revenue", axis=1)
 y = df["revenue"]
 
 print('---------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=58)
 lr = LinearRegression().fit(X_test, y_test)
 
 score = lr.score(X_train, y_train)
@@ -35,7 +36,7 @@ print(f'LR overall score: {score}')
 
 print('---------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=58)
 ann = MLPRegressor(max_iter=1000,hidden_layer_sizes=2,learning_rate_init=0.05).fit(X_train, y_train)
 
 score = ann.score(X_train, y_train)
@@ -49,7 +50,7 @@ print(f'ANN overall score: {score}')
 
 print('---------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=58)
 svr = make_pipeline(SVR(kernel = "linear", C=1.0, epsilon=0.2)).fit(X_train, y_train)
 svr2 = make_pipeline(SVR(kernel = "rbf", C=1.0, epsilon=0.2)).fit(X_train, y_train)
 
