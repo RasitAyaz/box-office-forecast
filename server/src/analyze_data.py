@@ -1,8 +1,10 @@
 from genericpath import isfile
 import os
 
+
 import seaborn as sns
 import pandas as pd
+
 import matplotlib.pyplot as mp
 
 
@@ -56,7 +58,20 @@ def plot_box_plot():
     mp.savefig(f'{current_path}/../figures/Impacts_of_Genres.jpg')
     mp.show()
 
-
+def plot_pie_chart():
+    
+    impact_genres_path = f'{current_path}/../data/impacts/genres.csv'
+    data = data_read_from(impact_genres_path)
+    data = data[:10]
+    
+    colors = ["#3B1A1F", "#0F6CC5", "#D46DDE", "#F5A86C", "#E1EB67"]
+    mp.pie(data['importance'], labels=data['name'], colors=colors, shadow=True, startangle=140)
+    mp.title("Importances of Genres")
+    mp.savefig(f'{current_path}/../figures/Pie_chart.jpg')
+    mp.show()
+    
+    
+    
 def data_read_from(path):
     if isfile(path):
         return pd.read_csv(path)
@@ -68,4 +83,15 @@ def data_read_from(path):
 current_path = os.path.dirname(__file__)
 
 # plot_heatmap()
-plot_box_plot()
+# plot_box_plot()
+plot_pie_chart()
+
+
+
+
+
+
+
+
+
+
