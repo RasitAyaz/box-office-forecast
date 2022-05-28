@@ -28,4 +28,14 @@ def forecast_linear_regression(movie):
     filename = '{current_path}/../models/linear_regression.sav'.format(current_path=current_path)
     loaded_model = pickle.load(open(filename, 'rb'))
     return loaded_model.predict()
+
+def forecast_artificial_neural_network(movie):
+    filename = '{current_path}/../models/artificial_neural_network.sav'.format(current_path=current_path)
+    loaded_model = pickle.load(open(filename, 'rb'))
+    return loaded_model.predict()
+
+def forecast_support_vector_regression(movie):
+    filename = '{current_path}/../models/support_vector_regression.sav'.format(current_path=current_path)
+    loaded_model = pickle.load(open(filename, 'rb'))
+    return loaded_model.predict()
     
