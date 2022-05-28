@@ -197,8 +197,6 @@ def filter_by_impact_and_store(feature, list_feature, counts: dict, min_importan
             importances[feature_id] = feature_importance
         count += 1
 
-    # importances = {k: v for k, v in sorted(importances.items(), key=lambda item: item[1], reverse=True)}
-
     importance_data_items = []
     
     for id, item in counts.items():
@@ -279,20 +277,20 @@ filter_by_count('months', month_counts, min_count=2)
 filter_by_count('original_languages', original_language_counts, min_count=2)
 
 filter_by_count('genres', genre_counts, min_count=2)
-filter_by_count('companies', company_counts, min_count=2)
-filter_by_count('countries', country_counts, min_count=2)
-filter_by_count('languages', language_counts, min_count=2)
-filter_by_count('keywords', keyword_counts, min_count=2)
-filter_by_count('cast', cast_counts, min_count=2)
+filter_by_count('companies', company_counts, min_count=10)
+filter_by_count('countries', country_counts, min_count=10)
+filter_by_count('languages', language_counts, min_count=10)
+filter_by_count('keywords', keyword_counts, min_count=10)
+filter_by_count('cast', cast_counts, min_count=3)
 
-filter_by_count('directing', directing_counts, min_count=2)
-filter_by_count('writing', writing_counts, min_count=2)
-filter_by_count('production', production_counts, min_count=2)
-filter_by_count('editing', editing_counts, min_count=2)
-filter_by_count('camera', camera_counts, min_count=2)
-filter_by_count('art', art_counts, min_count=2)
-filter_by_count('sound', sound_counts, min_count=2)
-filter_by_count('costume', costume_counts, min_count=2)
+filter_by_count('directing', directing_counts, min_count=10)
+filter_by_count('writing', writing_counts, min_count=10)
+filter_by_count('production', production_counts, min_count=10)
+filter_by_count('editing', editing_counts, min_count=10)
+filter_by_count('camera', camera_counts, min_count=10)
+filter_by_count('art', art_counts, min_count=10)
+filter_by_count('sound', sound_counts, min_count=10)
+filter_by_count('costume', costume_counts, min_count=10)
 
 print('\n\nIMPORTANCE FILTERS')
 print('----------------------------------------------------')

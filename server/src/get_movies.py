@@ -4,14 +4,16 @@ import os
 import requests
 from genericpath import isfile
 
+from format_movie_json import format_movie_json
+
 current_path = os.path.dirname(__file__)
 
-api_url = 'https://api.themoviedb.org/3'
-api_key = None
+tmdb_url = 'https://api.themoviedb.org/3'
+tmdb_key = None
 keys_path = f'{current_path}/../assets/keys.json'
 if isfile(keys_path):
     data = json.load(open(keys_path))
-    api_key = data['tmdb_api_key']
+    tmdb_key = data['tmdb_api_key']
 else:
     print(f'{keys_path} could not be found.')
     exit()
@@ -21,7 +23,7 @@ def get_movie_details_in_page(page_json, movies: dict):
     for movie in page_json['results']:
         if str(movie['id']) in movies:
             continue
-        url = f'{api_url}/movie/{movie["id"]}?api_key={api_key}&append_to_response=credits,release_dates,keywords'
+        url = f'{tmdb_url}/movie/{movie["id"]}?api_key={tmdb_key}&append_to_response=credits,release_dates,keywords'
         response = requests.get(url)
         if response.ok:
             movie = json.loads(response.text)
@@ -29,41 +31,7 @@ def get_movie_details_in_page(page_json, movies: dict):
                 return False
             if movie['budget'] >= 10000 and movie['revenue'] >= 10000 and movie['belongs_to_collection'] == None:
                 print(f'Fetched "{movie["title"]}".')
-                new_movie = {
-                    'imdb_id': movie['imdb_id'],
-                    'title': movie['title'],
-                    'original_language': movie['original_language'],
-                    'overview': movie['overview'],
-                    'budget': movie['budget'],
-                    'revenue': movie['revenue'],
-                    'release_date': movie['release_date'],
-                    'runtime': movie['runtime'],
-                    'popularity': movie['popularity'],
-                    'vote_average': movie['vote_average'],
-                    'vote_count': movie['vote_count'],
-                    'genres': movie['genres'],
-                    'production_companies': movie['production_companies'],
-                    'production_countries': movie['production_countries'],
-                    'spoken_languages': movie['spoken_languages'],
-                    'keywords': movie['keywords']['keywords'],
-                    'release_dates': movie['release_dates']['results'],
-                    'cast': [],
-                    'crew': [],
-                }
-                for person in movie['credits']['cast']:
-                    new_movie['cast'].append({
-                        'id': person['id'],
-                        'name': person['name'],
-                        'character': person['character'],
-                    })
-                for person in movie['credits']['crew']:
-                    new_movie['crew'].append({
-                        'id': person['id'],
-                        'name': person['name'],
-                        'job': person['job'],
-                        'department': person['department'],
-                    })
-                movies[movie['id']] = new_movie
+                movies[movie['id']] = format_movie_json(movie)
         else:
             print(f'{response.status_code}: Could not get "{movie["title"]}".')
 
@@ -83,7 +51,7 @@ def get_movies_by_year(year, init_page_num):
     print(f'==================== {year} ====================')
     print(f'Fetching page {init_page_num}...')
     # Release type 3 means theatrical release
-    url = f'{api_url}/discover/movie?api_key={api_key}&primary_release_year={year}&with_release_type=3&sort_by=vote_count.desc'
+    url = f'{tmdb_url}/discover/movie?api_key={tmdb_key}&primary_release_year={year}&with_release_type=3&sort_by=vote_count.desc'
     page_url = f'{url}&page={init_page_num}'
     try:
         response = requests.get(page_url)
