@@ -1,4 +1,5 @@
 import os
+import pickle
 
 import pandas as pd
 from genericpath import isfile
@@ -22,3 +23,9 @@ def forecast_with_linear_regression(movie):
         sum += value * model_data.iloc[0][feature]
 
     return sum / len(vector)
+
+def forecast_linear_regression(movie):
+    filename = '{current_path}/../models/linear_regression.sav'.format(current_path=current_path)
+    loaded_model = pickle.load(open(filename, 'rb'))
+    return loaded_model.predict()
+    
