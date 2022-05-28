@@ -22,7 +22,7 @@ y = df["revenue"]
 
 print('---------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=58)
+X_train, X_test, y_train, y_test = train_test_split(X, y)
 lr = LinearRegression().fit(X_test, y_test)
 
 score = lr.score(X_train, y_train)
@@ -36,8 +36,8 @@ print(f'LR overall score: {score}')
 
 print('---------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=58)
-ann = MLPRegressor(max_iter=1000,hidden_layer_sizes=2,learning_rate_init=0.05).fit(X_train, y_train)
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+ann = MLPRegressor(max_iter=1000,hidden_layer_sizes=10,learning_rate_init=0.05).fit(X_train, y_train)
 
 score = ann.score(X_train, y_train)
 print(f'ANN train score: {score}')
@@ -50,7 +50,7 @@ print(f'ANN overall score: {score}')
 
 print('---------------------------')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y,random_state=58)
+X_train, X_test, y_train, y_test = train_test_split(X, y)
 svr = make_pipeline(SVR(kernel = "linear", C=1.0, epsilon=0.2)).fit(X_train, y_train)
 svr2 = make_pipeline(SVR(kernel = "rbf", C=1.0, epsilon=0.2)).fit(X_train, y_train)
 
@@ -63,15 +63,5 @@ print(f'SVR with linear kernel test score: {score}')
 score = svr.score(X, y)
 print(f'SVR with linear kernel overall score: {score}')
 
-print('---------------------------')
-
-score = svr2.score(X_train, y_train)
-print(f'SVR with rbf kernel train score: {score}')
-
-score = svr2.score(X_test, y_test)
-print(f'SVR with rbf kernel test score: {score}')
-
-score = svr2.score(X, y)
-print(f'SVR with rbf kernel overall score: {score}')
 
     

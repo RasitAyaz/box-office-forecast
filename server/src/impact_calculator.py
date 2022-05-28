@@ -1,11 +1,9 @@
 import json
-import operator
 import os
 
 import pandas as pd
 from genericpath import isfile
 from matplotlib import pyplot as plt
-from scipy.stats import pearsonr
 from xgboost import XGBRegressor
 
 current_path = os.path.dirname(__file__)
@@ -273,45 +271,45 @@ for year in range(1990, 2020):
 print('\n\nCOUNT FILTERS')
 print('----------------------------------------------------')
 
-filter_by_count('months', month_counts, min_count=2)
-filter_by_count('original_languages', original_language_counts, min_count=2)
+filter_by_count('months', month_counts, min_count=0)
+filter_by_count('original_languages', original_language_counts, min_count=3)
 
-filter_by_count('genres', genre_counts, min_count=2)
-filter_by_count('companies', company_counts, min_count=10)
-filter_by_count('countries', country_counts, min_count=10)
-filter_by_count('languages', language_counts, min_count=10)
-filter_by_count('keywords', keyword_counts, min_count=10)
-filter_by_count('cast', cast_counts, min_count=3)
+filter_by_count('genres', genre_counts, min_count=0)
+filter_by_count('companies', company_counts, min_count=5)
+filter_by_count('countries', country_counts, min_count=5)
+filter_by_count('languages', language_counts, min_count=20)
+filter_by_count('keywords', keyword_counts, min_count=0)
+filter_by_count('cast', cast_counts, min_count=0)
 
-filter_by_count('directing', directing_counts, min_count=10)
-filter_by_count('writing', writing_counts, min_count=10)
-filter_by_count('production', production_counts, min_count=10)
-filter_by_count('editing', editing_counts, min_count=10)
-filter_by_count('camera', camera_counts, min_count=10)
-filter_by_count('art', art_counts, min_count=10)
-filter_by_count('sound', sound_counts, min_count=10)
-filter_by_count('costume', costume_counts, min_count=10)
+filter_by_count('directing', directing_counts, min_count=2)
+filter_by_count('writing', writing_counts, min_count=2)
+filter_by_count('production', production_counts, min_count=2)
+filter_by_count('editing', editing_counts, min_count=2)
+filter_by_count('camera', camera_counts, min_count=2)
+filter_by_count('art', art_counts, min_count=2)
+filter_by_count('sound', sound_counts, min_count=2)
+filter_by_count('costume', costume_counts, min_count=2)
 
 print('\n\nIMPORTANCE FILTERS')
 print('----------------------------------------------------')
 
-filter_by_impact_and_store('months', None, month_counts, min_importance=0.00001)
+filter_by_impact_and_store('months', None, month_counts, min_importance=0.01)
 filter_by_impact_and_store('original_languages', None, original_language_counts, min_importance=1e-4)
 
-filter_by_impact_and_store('genres', 'genres', genre_counts, min_importance=1e-4)
-filter_by_impact_and_store('companies', 'production_companies', company_counts, min_importance=1e-4)
-filter_by_impact_and_store('countries', 'production_countries', country_counts, min_importance=1e-4)
-filter_by_impact_and_store('languages', 'spoken_languages', language_counts, min_importance=1e-4)
-filter_by_impact_and_store('keywords', 'keywords', keyword_counts, min_importance=1e-4)
+filter_by_impact_and_store('genres', 'genres', genre_counts, min_importance=0.01)
+filter_by_impact_and_store('companies', 'production_companies', company_counts, min_importance=1e-5)
+filter_by_impact_and_store('countries', 'production_countries', country_counts, min_importance=1e-03)
+filter_by_impact_and_store('languages', 'spoken_languages', language_counts, min_importance=1e-2)
+filter_by_impact_and_store('keywords', 'keywords', keyword_counts, min_importance=1e-5)
 filter_by_impact_and_store('cast', 'cast', cast_counts, min_importance=1e-5)
-filter_by_impact_and_store('directing', 'crew', directing_counts, min_importance=1e-4)
 
-filter_by_impact_and_store('writing', 'crew', writing_counts, min_importance=1e-4)
-filter_by_impact_and_store('production', 'crew', production_counts, min_importance=1e-4)
-filter_by_impact_and_store('editing', 'crew', editing_counts, min_importance=1e-4)
-filter_by_impact_and_store('camera', 'crew', camera_counts, min_importance=1e-4)
-filter_by_impact_and_store('art', 'crew', art_counts, min_importance=1e-4)
-filter_by_impact_and_store('sound', 'crew', sound_counts, min_importance=1e-4)
-filter_by_impact_and_store('costume', 'crew', costume_counts, min_importance=1e-4)
+filter_by_impact_and_store('directing', 'crew', directing_counts, min_importance=1e-6) 
+filter_by_impact_and_store('writing', 'crew', writing_counts, min_importance=1e-6)
+filter_by_impact_and_store('production', 'crew', production_counts, min_importance=1e-6)
+filter_by_impact_and_store('editing', 'crew', editing_counts, min_importance=1e-6)
+filter_by_impact_and_store('camera', 'crew', camera_counts, min_importance=1e-6)
+filter_by_impact_and_store('art', 'crew', art_counts, min_importance=1e-6)
+filter_by_impact_and_store('sound', 'crew', sound_counts, min_importance=1e-6)
+filter_by_impact_and_store('costume', 'crew', costume_counts, min_importance=1e-6)
 
 print(f'\nTotal movies: {len(all_movies)}')
