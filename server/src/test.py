@@ -7,24 +7,24 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
+from read_dataset import read_dataset
+from standardization import standardize
+
 current_path = os.path.dirname(__file__)
-dataset_path = f'{current_path}/../dataset.csv'
 
-if isfile(dataset_path):
-    data = pd.read_csv(dataset_path)
-    print(f'Data size: {len(data)}')
-    
-df = data.copy()
+data = read_dataset()
+data = standardize(data)
 
-X = df.drop("revenue", axis=1)
-y = df["revenue"]
+X = data.drop('revenue', axis=1)
+y = data['revenue']
 
 print('---------------------------')
 
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-lr = LinearRegression().fit(X_test, y_test)
+lr = LinearRegression().fit(X_train, y_train)
 
 # Store linear regression the model to disk
 filename = '{current_path}/../models/linear_regression.sav'.format(current_path=current_path)

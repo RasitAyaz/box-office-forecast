@@ -15,6 +15,7 @@ function Cast({ cast }) {
                                 {item.profile_path && <img style={{ borderRadius: "20px", maxHeight: "100%", margin: "auto" }} src={api.tmdbImage + '/w154' + item.profile_path} />}
                             </div>
                             <p style={{ fontWeight: "bold" }}>{item.name}</p>
+                            <p style={{ color: "var(--primaryColorLight)" }}>{item.character}</p>
                         </div>
                     ))
                 }

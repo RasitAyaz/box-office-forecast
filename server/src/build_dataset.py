@@ -121,13 +121,6 @@ def remove_outliers(data):
 
     return data
 
-
-def standardize(data: pd.DataFrame):
-    columns = data.columns
-    scaler = preprocessing.StandardScaler()
-    data = scaler.fit_transform(data)
-    return pd.DataFrame(data, columns=columns)
-
 data: pd.DataFrame
 data = pd.DataFrame(data_items)
 
@@ -142,7 +135,7 @@ print(f'Data size: {len(data)}')
 # print(f'Data size after outlier removal: {len(data)}')
 
 # Standardization
-data = standardize(data)
+# data = standardize(data)
 
 dataset_path = f'{current_path}/../dataset.csv'
 data.to_csv(dataset_path, index=False)

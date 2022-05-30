@@ -69,7 +69,8 @@ def get_diminishing_list_impact(list, impact_data):
     else:
         return impact_sum
 
-def movie_to_vector(movie, impacts):
+
+def movie_to_vector(movie, impacts, include_revenue=True):
     date = movie['release_date']
 
     crew = movie['crew']
@@ -110,11 +111,11 @@ def movie_to_vector(movie, impacts):
     sound_avg, sound_max = get_list_impact(sound, impacts['sound'])
     costume_avg, costume_max = get_list_impact(costume, impacts['costume'])
 
-    return {
+    vector = {
         'budget': movie['budget'],
-        'runtime': movie['runtime'],
-        'month_impact': month_impact,
-        'original_language_impact': original_language_impact,
+        # 'runtime': movie['runtime'],
+        # 'month_impact': month_impact,
+        # 'original_language_impact': original_language_impact,
         'genre_avg': genre_avg,
         'genre_max': genre_max,
         'company_avg': company_avg,
@@ -124,11 +125,11 @@ def movie_to_vector(movie, impacts):
         'language_avg': language_avg,
         'language_max': language_max,
         'cast_avg': cast_avg,
-        'cast_max': cast_max,
+        # 'cast_max': cast_max,
         'cast_dim': cast_dim,
         'cast_count': len(cast),
         'keyword_avg': keyword_avg,
-        'keyword_max': keyword_max,
+        # 'keyword_max': keyword_max,
         'keyword_dim': keyword_dim,
         'keyword_count': len(movie['keywords']),
         'directing_avg': directing_avg,
@@ -147,5 +148,9 @@ def movie_to_vector(movie, impacts):
         'sound_max': sound_max,
         'costume_avg': costume_avg,
         'costume_max': costume_max,
-        'revenue': movie['revenue'],
     }
+
+    if include_revenue:
+        vector['revenue'] = movie['revenue']
+
+    return vector
