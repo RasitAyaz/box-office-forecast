@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from genericpath import isfile
 from scipy import stats
-from sklearn import preprocessing
 
 from movie_to_vector import movie_to_vector
 from read_impacts import read_impacts
@@ -95,7 +94,7 @@ impacts = read_impacts()
 
 data_items = []
 
-for year in range(1990, 2020):
+for year in range(1991, 2020):
     print(f'Processing year {year}...', end='\r')
     movies: dict
     movies = read_json_file(f'{current_path}/../data/years/{year}.json')
