@@ -36,7 +36,7 @@ def get_list_impact(year, list, impact_data):
     impact_sum = 0
 
     for item in list:
-        impact = get_impact(get_id(item), impact_data)
+        impact = get_impact(year, get_id(item), impact_data)
         if impact is None:
             continue
         impact_sum += impact
