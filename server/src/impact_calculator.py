@@ -148,7 +148,7 @@ def store_impacts_to_csv(feature, impacts: dict):
             'name': item['name'],
         }
 
-        for year in range(1990, 1995):
+        for year in range(1990, 2020):
             if year not in item['impacts']:
                 data_item[f'{year}'] = 0
             else:
@@ -235,7 +235,7 @@ def calculate_importances(year, feature, list_feature, counts: dict, lower_bound
 impact_json = {}
 
 
-for max_year in range(1991, 1995):
+for max_year in range(1991, 2020):
     month_counts = {}
     original_language_counts = {}
 
