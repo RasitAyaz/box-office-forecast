@@ -13,20 +13,6 @@ current_path = os.path.dirname(__file__)
 data_path = f'{current_path}/../data'
 
 
-def get_id(item):
-    if 'iso_3166_1' in item:
-        return item['iso_3166_1']
-    if 'iso_639_1' in item:
-        return item['iso_639_1']
-    return item['id']
-
-
-def get_name(item):
-    if 'english_name' in item:
-        return item['english_name']
-    return item['name']
-
-
 def read_json_file(path):
     if isfile(path):
         return json.load(open(path))
@@ -41,53 +27,6 @@ def get_year(date):
 
 def get_month(date):
     return int(date[5:7])
-
-
-def get_impact(id, impact_data: pd.DataFrame):
-    search_data = impact_data.loc[impact_data['id'] == id]
-    if len(search_data) == 0:
-        return None
-    else:
-        return search_data.iloc[0]['importance']
-
-
-def get_list_impact(list, impact_data):
-    impact_max = 0
-    impact_sum = 0
-
-    for item in list:
-        impact = get_impact(get_id(item), impact_data)
-        if impact is None:
-            continue
-        impact_sum += impact
-        impact_max = max(impact_max, impact)
-
-    if len(list) == 0 or impact_max == 0:
-        return pd.NA, pd.NA
-    else:
-        impact_avg = impact_sum / len(list)
-        return impact_avg, impact_max
-
-
-def get_diminishing_list_impact(list, impact_data):
-    order = 1
-    impact_sum = 0
-    weight_sum = 0
-
-    for item in list:
-        impact = get_impact(get_id(item), impact_data)
-        if impact is None:
-            continue
-        weight = 1 / order
-        impact = impact * weight
-        order += 1
-        impact_sum += impact
-        weight_sum += weight
-
-    if weight_sum == 0:
-        return pd.NA
-    else:
-        return impact_sum
 
 
 impacts = read_impacts()
