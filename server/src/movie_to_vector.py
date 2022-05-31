@@ -23,20 +23,20 @@ def get_month(date):
     return int(date[5:7])
 
 
-def get_impact(year, id, impact_data: pd.DataFrame):
+def get_impact(id, impact_data: pd.DataFrame):
     search_data = impact_data.loc[impact_data['id'] == id]
     if len(search_data) == 0:
         return None
     else:
-        return search_data.iloc[0][year]
+        return search_data.iloc[0]['importance']
 
 
-def get_list_impact(year, list, impact_data):
+def get_list_impact(list, impact_data):
     impact_max = 0
     impact_sum = 0
 
     for item in list:
-        impact = get_impact(year, get_id(item), impact_data)
+        impact = get_impact(get_id(item), impact_data)
         if impact is None:
             continue
         impact_sum += impact
@@ -49,13 +49,13 @@ def get_list_impact(year, list, impact_data):
         return impact_avg, impact_max
 
 
-def get_diminishing_list_impact(year, list, impact_data):
+def get_diminishing_list_impact(list, impact_data):
     order = 1
     impact_sum = 0
     weight_sum = 0
 
     for item in list:
-        impact = get_impact(year, get_id(item), impact_data)
+        impact = get_impact(get_id(item), impact_data)
         if impact is None:
             continue
         weight = 1 / order
@@ -72,7 +72,6 @@ def get_diminishing_list_impact(year, list, impact_data):
 
 def movie_to_vector(movie, impacts, include_revenue=True):
     date = movie['release_date']
-    year = get_year(date)
 
     crew = movie['crew']
     cast = movie['cast']
@@ -91,32 +90,32 @@ def movie_to_vector(movie, impacts, include_revenue=True):
     sound = [p for p in crew if p['department'] == 'Sound']
     costume = [p for p in crew if p['department'] == 'Costume & Make-Up']
 
-    month_impact = get_impact(year, get_month(date), impacts['months'])
-    original_language_impact = get_impact(year, movie['original_language'], impacts['original_languages'])
+    month_impact = get_impact(get_month(date), impacts['months'])
+    original_language_impact = get_impact(movie['original_language'], impacts['original_languages'])
 
-    genre_avg, genre_max = get_list_impact(year, genres, impacts['genres'])
-    company_avg, company_max = get_list_impact(year, companies, impacts['companies'])
-    country_avg, country_max = get_list_impact(year, movie['production_countries'], impacts['countries'])
-    language_avg, language_max = get_list_impact(year, movie['spoken_languages'], impacts['languages'])
-    cast_avg, cast_max = get_list_impact(year, cast, impacts['cast'], str(int(date[0:4]) - 1))
-    cast_dim = get_diminishing_list_impact(year, cast, impacts['cast'], str(int(date[0:4]) - 1))
-    keyword_avg, keyword_max = get_list_impact(year, movie['keywords'], impacts['keywords'])
-    keyword_dim = get_diminishing_list_impact(year, movie['keywords'], impacts['keywords'])
+    genre_avg, genre_max = get_list_impact(genres, impacts['genres'])
+    company_avg, company_max = get_list_impact(companies, impacts['companies'])
+    country_avg, country_max = get_list_impact(movie['production_countries'], impacts['countries'])
+    language_avg, language_max = get_list_impact(movie['spoken_languages'], impacts['languages'])
+    cast_avg, cast_max = get_list_impact(cast, impacts['cast'])
+    cast_dim = get_diminishing_list_impact(cast, impacts['cast'])
+    keyword_avg, keyword_max = get_list_impact(movie['keywords'], impacts['keywords'])
+    keyword_dim = get_diminishing_list_impact(movie['keywords'], impacts['keywords'])
 
-    directing_avg, directing_max = get_list_impact(year, directing, impacts['directing'])
-    writing_avg, writing_max = get_list_impact(year, writing, impacts['writing'])
-    production_avg, production_max = get_list_impact(year, production, impacts['production'])
-    editing_avg, editing_max = get_list_impact(year, editing, impacts['editing'])
-    camera_avg, camera_max = get_list_impact(year, camera, impacts['camera'])
-    art_avg, art_max = get_list_impact(year, art, impacts['art'])
-    sound_avg, sound_max = get_list_impact(year, sound, impacts['sound'])
-    costume_avg, costume_max = get_list_impact(year, costume, impacts['costume'])
+    directing_avg, directing_max = get_list_impact(directing, impacts['directing'])
+    writing_avg, writing_max = get_list_impact(writing, impacts['writing'])
+    production_avg, production_max = get_list_impact(production, impacts['production'])
+    editing_avg, editing_max = get_list_impact(editing, impacts['editing'])
+    camera_avg, camera_max = get_list_impact(camera, impacts['camera'])
+    art_avg, art_max = get_list_impact(art, impacts['art'])
+    sound_avg, sound_max = get_list_impact(sound, impacts['sound'])
+    costume_avg, costume_max = get_list_impact(costume, impacts['costume'])
 
     vector = {
         'budget': movie['budget'],
-        'runtime': movie['runtime'],
-        'month_impact': month_impact,
-        'original_language_impact': original_language_impact,
+        # 'runtime': movie['runtime'],
+        # 'month_impact': month_impact,
+        # 'original_language_impact': original_language_impact,
         'genre_avg': genre_avg,
         'genre_max': genre_max,
         'company_avg': company_avg,
